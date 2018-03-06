@@ -17,10 +17,10 @@ services:
       - FABRIC_CA_SERVER_CA_NAME=ca-seller
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/f6e23f92c67f3de0c1dd50c178a183b5bb43d2b09af52a36cf933b597f7f08d8_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/0b52106532395360f29820a0a1437ca7b06db40cdc31e1cf553222ab407a13e8_sk
     ports:
       - "7054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/f6e23f92c67f3de0c1dd50c178a183b5bb43d2b09af52a36cf933b597f7f08d8_sk -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/0b52106532395360f29820a0a1437ca7b06db40cdc31e1cf553222ab407a13e8_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/seller.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca_peerSeller
@@ -34,10 +34,10 @@ services:
       - FABRIC_CA_SERVER_CA_NAME=ca-courier
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/6f3dfb5f73d8f8a5c56cc505de768099859a27f4a9e70df22c14fe7d1b18c09a_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/04f202d0e7e7a524d80ef84548c1fc264bc6144023324e401f4b0fc92b238d88_sk
     ports:
       - "8054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/6f3dfb5f73d8f8a5c56cc505de768099859a27f4a9e70df22c14fe7d1b18c09a_sk -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/04f202d0e7e7a524d80ef84548c1fc264bc6144023324e401f4b0fc92b238d88_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/courier.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca_peerCourier
