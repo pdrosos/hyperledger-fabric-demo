@@ -1,0 +1,87 @@
+version: '2'
+
+volumes:
+  orderer.blockchain.localhost:
+  peer0.seller.blockchain.localhost:
+  peer1.seller.blockchain.localhost:
+  peer0.courier.blockchain.localhost:
+  peer1.courier.blockchain.localhost:
+
+networks:
+  byfn:
+
+services:
+
+  orderer.blockchain.localhost:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.blockchain.localhost
+    container_name: orderer.blockchain.localhost
+    networks:
+      - byfn
+
+  peer0.seller.blockchain.localhost:
+    container_name: peer0.seller.blockchain.localhost
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.seller.blockchain.localhost
+    networks:
+      - byfn
+
+  peer1.seller.blockchain.localhost:
+    container_name: peer1.seller.blockchain.localhost
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.seller.blockchain.localhost
+    networks:
+      - byfn
+
+  peer0.courier.blockchain.localhost:
+    container_name: peer0.courier.blockchain.localhost
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.courier.blockchain.localhost
+    networks:
+      - byfn
+
+  peer1.courier.blockchain.localhost:
+    container_name: peer1.courier.blockchain.localhost
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.courier.blockchain.localhost
+    networks:
+      - byfn
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$IMAGE_TAG
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.seller.blockchain.localhost:7051
+      - CORE_PEER_LOCALMSPID=SellerMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/seller.blockchain.localhost/peers/peer0.seller.blockchain.localhost/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/seller.blockchain.localhost/peers/peer0.seller.blockchain.localhost/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/seller.blockchain.localhost/peers/peer0.seller.blockchain.localhost/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/seller.blockchain.localhost/users/Admin@seller.blockchain.localhost/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash -c './scripts/script.sh ${CHANNEL_NAME} ${DELAY}; sleep $TIMEOUT'
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./../chaincode/:/opt/gopath/src/github.com/hyperledger/fabric/examples/chaincode/go
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.blockchain.localhost
+      - peer0.seller.blockchain.localhost
+      - peer1.seller.blockchain.localhost
+      - peer0.courier.blockchain.localhost
+      - peer1.courier.blockchain.localhost
+    networks:
+      - byfn
+
