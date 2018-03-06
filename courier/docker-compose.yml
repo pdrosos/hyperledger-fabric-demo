@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  app:
+    image: golang:1.10-stretch
+    volumes:
+      - .:/go/src/github.com/pdrosos/hyperledger-fabric-demo/courier
+    working_dir: /go/src/github.com/pdrosos/hyperledger-fabric-demo/courier
+    ports:
+      - 8888:8888
+    entrypoint: ./bin/apiserver --port 8888
