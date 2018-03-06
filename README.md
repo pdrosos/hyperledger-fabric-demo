@@ -9,7 +9,7 @@ Seller needs to keep a separate private ledger of shipments for each of their co
 
 The projects consists of the following components:
  
-[Hyperledger Fabric network](hyperledger-fabric-network/README.md) between the seller and one courier company.
+[Hyperledger Fabric network](network/README.md) between the seller and one courier company.
  
 [Chaincode](chaincode/README.md) in the seller-courier one channel.
 
