@@ -6,7 +6,7 @@ Clone the application: `git clone https://github.com/pdrosos/hyperledger-fabric-
 
 Start the docker containers: `docker-compose up -d`
 
-Application runs on http://localhost:7777
+Application runs on http://localhost:8888
 
 
 ## For developers
