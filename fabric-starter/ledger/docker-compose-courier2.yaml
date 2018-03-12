@@ -16,8 +16,8 @@ services:
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier2.blockchain.localhost-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/6e3490b505fe8d5130c82f2ad0483cf3cfb9b0d83e8a061cb301c3c76a772932_sk
-#    ports:
-#      - 9054:7054
+    ports:
+      - 9054:7054
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
       - ../artifacts/crypto-config/peerOrganizations/courier2.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
