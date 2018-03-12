@@ -1,0 +1,57 @@
+#
+# Copyright Altoros. All Rights Reserved.
+#
+
+version: '2'
+
+services:
+
+  orderer.blockchain.localhost:
+    container_name: orderer.blockchain.localhost
+    image: hyperledger/fabric-orderer:x86_64-1.0.6
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/crypto/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/crypto/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/crypto/orderer/tls/server.crt
+      #- ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/crypto/orderer/tls/ca.crt, /etc/hyperledger/crypto/peerseller/tls/ca.crt, /etc/hyperledger/crypto/peercourier1/tls/ca.crt, /etc/hyperledger/crypto/peercourier2/tls/ca.crt]
+      #TODO remove?
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/crypto/orderer/tls/ca.crt]
+    working_dir: /etc/hyperledger
+    command: orderer
+    ports:
+      - 7050:7050
+    volumes:
+        - ../artifacts/channel:/etc/hyperledger/configtx
+        - ../artifacts/crypto-config/ordererOrganizations/blockchain.localhost/orderers/orderer.blockchain.localhost/:/etc/hyperledger/crypto/orderer
+#        - ../artifacts/crypto-config/peerOrganizations/seller.blockchain.localhost/peers/peer0.seller.blockchain.localhost/:/etc/hyperledger/crypto/peerseller
+#        - ../artifacts/crypto-config/peerOrganizations/courier1.blockchain.localhost/peers/peer0.courier1.blockchain.localhost/:/etc/hyperledger/crypto/peercourier1
+#        - ../artifacts/crypto-config/peerOrganizations/courier2.blockchain.localhost/peers/peer0.courier2.blockchain.localhost/:/etc/hyperledger/crypto/peercourier2
+
+  cli.blockchain.localhost:
+    container_name: cli.blockchain.localhost
+    extends:
+      file: base.yaml
+      service: cli-base
+#    volumes:
+#      - ../artifacts/crypto-config/ordererOrganizations/blockchain.localhost/orderers/orderer.blockchain.localhost/tls:/etc/hyperledger/crypto/orderer/tls
+    extra_hosts:
+      - orderer.blockchain.localhost:54.234.201.67
+      - www.blockchain.localhost:54.234.201.67
+      - www.seller.blockchain.localhost:54.86.191.160
+      - www.courier1.blockchain.localhost:54.243.0.168
+      - www.courier2.blockchain.localhost:54.211.142.174
+
+  # simple http server to disseminate certificates
+  www.blockchain.localhost:
+    extends:
+      file: base.yaml
+      service: www-base
+    container_name: www.blockchain.localhost
+    ports:
+      - 8080:80

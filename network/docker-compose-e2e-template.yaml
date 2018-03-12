@@ -8,13 +8,14 @@ volumes:
   peer1.courier.blockchain.localhost:
 
 networks:
-  byfn:
+  basic:
 services:
-  ca0:
+  ca.seller.blockchain.localhost:
     image: hyperledger/fabric-ca:$IMAGE_TAG
+    container_name: ca.seller.blockchain.localhost
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca-seller
+      - FABRIC_CA_SERVER_CA_NAME=ca.seller.blockchain.localhost
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY
@@ -23,15 +24,15 @@ services:
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/seller.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerSeller
     networks:
-      - byfn
+      - basic
 
-  ca1:
+  ca.courier.blockchain.localhost:
     image: hyperledger/fabric-ca:$IMAGE_TAG
+    container_name: ca.courier.blockchain.localhost
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca-courier
+      - FABRIC_CA_SERVER_CA_NAME=ca.courier.blockchain.localhost
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY
@@ -40,9 +41,8 @@ services:
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/courier.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerCourier
     networks:
-      - byfn
+      - basic
 
   orderer.blockchain.localhost:
     extends:
@@ -50,7 +50,7 @@ services:
       service: orderer.blockchain.localhost
     container_name: orderer.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer0.seller.blockchain.localhost:
     container_name: peer0.seller.blockchain.localhost
@@ -58,7 +58,7 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer0.seller.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer1.seller.blockchain.localhost:
     container_name: peer1.seller.blockchain.localhost
@@ -66,7 +66,7 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer1.seller.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer0.courier.blockchain.localhost:
     container_name: peer0.courier.blockchain.localhost
@@ -74,7 +74,7 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer0.courier.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer1.courier.blockchain.localhost:
     container_name: peer1.courier.blockchain.localhost
@@ -82,4 +82,4 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer1.courier.blockchain.localhost
     networks:
-      - byfn
+      - basic

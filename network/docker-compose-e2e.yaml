@@ -8,7 +8,7 @@ volumes:
   peer1.courier.blockchain.localhost:
 
 networks:
-  byfn:
+  basic:
 services:
   ca0:
     image: hyperledger/fabric-ca:$IMAGE_TAG
@@ -17,15 +17,15 @@ services:
       - FABRIC_CA_SERVER_CA_NAME=ca-seller
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/0b52106532395360f29820a0a1437ca7b06db40cdc31e1cf553222ab407a13e8_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/4abad60cf2c3bb5c5f0ef1b409d77f34140acae984afa7eb06de71ce2b7f1843_sk
     ports:
       - "7054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/0b52106532395360f29820a0a1437ca7b06db40cdc31e1cf553222ab407a13e8_sk -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/4abad60cf2c3bb5c5f0ef1b409d77f34140acae984afa7eb06de71ce2b7f1843_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/seller.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca_peerSeller
     networks:
-      - byfn
+      - basic
 
   ca1:
     image: hyperledger/fabric-ca:$IMAGE_TAG
@@ -34,15 +34,15 @@ services:
       - FABRIC_CA_SERVER_CA_NAME=ca-courier
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/04f202d0e7e7a524d80ef84548c1fc264bc6144023324e401f4b0fc92b238d88_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/170646d10f02f88ba641ffd65aa6200edd1f3a8f0c4ab2c5a9e3dc80bfca5f6f_sk
     ports:
       - "8054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/04f202d0e7e7a524d80ef84548c1fc264bc6144023324e401f4b0fc92b238d88_sk -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.courier.blockchain.localhost-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/170646d10f02f88ba641ffd65aa6200edd1f3a8f0c4ab2c5a9e3dc80bfca5f6f_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/courier.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca_peerCourier
     networks:
-      - byfn
+      - basic
 
   orderer.blockchain.localhost:
     extends:
@@ -50,7 +50,7 @@ services:
       service: orderer.blockchain.localhost
     container_name: orderer.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer0.seller.blockchain.localhost:
     container_name: peer0.seller.blockchain.localhost
@@ -58,7 +58,7 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer0.seller.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer1.seller.blockchain.localhost:
     container_name: peer1.seller.blockchain.localhost
@@ -66,7 +66,7 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer1.seller.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer0.courier.blockchain.localhost:
     container_name: peer0.courier.blockchain.localhost
@@ -74,7 +74,7 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer0.courier.blockchain.localhost
     networks:
-      - byfn
+      - basic
 
   peer1.courier.blockchain.localhost:
     container_name: peer1.courier.blockchain.localhost
@@ -82,4 +82,4 @@ services:
       file:  base/docker-compose-base.yaml
       service: peer1.courier.blockchain.localhost
     networks:
-      - byfn
+      - basic
