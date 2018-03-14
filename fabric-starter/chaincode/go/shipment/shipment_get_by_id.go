@@ -17,18 +17,18 @@ func (this ShipmentChaincode) getShipmentById(stub shim.ChaincodeStubInterface, 
 
 	logger.Debugf("Start getShipmentById for shipment ID %s", id)
 
-	shipmentAsbytes, err := stub.GetState(id)
+	shipmentAsBytes, err := stub.GetState(id)
 	if err != nil {
 		jsonResp := "{\"Error\":\"Failed to get state for shipment " + id + "\"}"
 
 		return shim.Error(jsonResp)
-	} else if shipmentAsbytes == nil {
+	} else if shipmentAsBytes == nil {
 		jsonResp := "{\"Error\":\"Shipment does not exist: " + id + "\"}"
 
 		return shim.Error(jsonResp)
 	}
 
-	logger.Debugf("End getShipmentById for shipment ID %s: %s", id, string(shipmentAsbytes))
+	logger.Debugf("End getShipmentById for shipment ID %s: %s", id, string(shipmentAsBytes))
 
-	return shim.Success(shipmentAsbytes)
+	return shim.Success(shipmentAsBytes)
 }
