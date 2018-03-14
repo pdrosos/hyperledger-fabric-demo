@@ -41,7 +41,7 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 
 	for index, element := range args {
 		if len(element) <= 0 {
-			errorMessage := fmt.Sprintf("Argument %s must be a non-empty string", index + 1)
+			errorMessage := fmt.Sprintf("Argument %s must be a non-empty string", index+1)
 			logger.Error(errorMessage)
 
 			return shim.Error(errorMessage)
@@ -181,5 +181,5 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 
 	logger.Debug("End createShipment")
 
-	return shim.Success(nil);
+	return shim.Success(nil)
 }

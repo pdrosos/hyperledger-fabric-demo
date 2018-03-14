@@ -2,8 +2,8 @@ package main
 
 import (
 	//"bytes"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -91,10 +91,10 @@ func (this ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfac
 		//bArrayMemberAlreadyWritten = true
 
 		historyItem := ShipmentHistoryItem{
-			TxId: response.TxId,
-			Value: string(response.Value),
+			TxId:      response.TxId,
+			Value:     string(response.Value),
 			Timestamp: time.Unix(response.Timestamp.Seconds, int64(response.Timestamp.Nanos)).String(),
-			IsDelete: response.IsDelete,
+			IsDelete:  response.IsDelete,
 		}
 
 		history = append(history, historyItem)

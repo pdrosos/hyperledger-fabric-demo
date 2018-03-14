@@ -12,5 +12,5 @@ func (this ShipmentChaincode) updateShipment(stub shim.ChaincodeStubInterface, a
 
 	logger.Debug("End updateShipment")
 
-	return shim.Success(nil);
+	return shim.Success(nil)
 }

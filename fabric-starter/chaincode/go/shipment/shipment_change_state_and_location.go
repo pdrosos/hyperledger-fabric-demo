@@ -18,7 +18,7 @@ func (this ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincode
 
 	for index, element := range args {
 		if len(element) <= 0 {
-			errorMessage := fmt.Sprintf("Argument %s must be a non-empty string", index + 1)
+			errorMessage := fmt.Sprintf("Argument %s must be a non-empty string", index+1)
 			logger.Error(errorMessage)
 
 			return shim.Error(errorMessage)
@@ -84,5 +84,5 @@ func (this ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincode
 
 	logger.Debugf("End changeShipmentStateAndLocation for shipment ID %s", id)
 
-	return shim.Success(nil);
+	return shim.Success(nil)
 }

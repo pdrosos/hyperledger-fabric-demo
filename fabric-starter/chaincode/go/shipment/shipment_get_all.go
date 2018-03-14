@@ -8,9 +8,7 @@ import (
 func (this ShipmentChaincode) getAllShipments(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	logger.Debug("Start getAllShipments")
 
-
-
 	logger.Debug("Start getAllShipments")
 
-	return shim.Success(nil);
+	return shim.Success(nil)
 }

@@ -1,8 +1,8 @@
 package main
 
 type Address struct {
-	Country string `json:"country"`
-	City string `json:"city"`
+	Country  string `json:"country"`
+	City     string `json:"city"`
 	PostCode string `json:"postCode"`
-	Address string `json:"address"`
+	Address  string `json:"address"`
 }

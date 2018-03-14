@@ -52,7 +52,7 @@ func (this *ShipmentChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Respo
 		return this.updateShipment(stub, args)
 	} else if function == "changeShipmentStateAndLocation" {
 		return this.changeShipmentStateAndLocation(stub, args)
-	}  else if function == "getShipmentById" {
+	} else if function == "getShipmentById" {
 		return this.getShipmentById(stub, args)
 	} else if function == "getAllShipments" {
 		return this.getAllShipments(stub, args)
@@ -60,11 +60,11 @@ func (this *ShipmentChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Respo
 		return this.getShipmentHistory(stub, args)
 	}
 
-	return pb.Response{Status:403, Message:"Invalid invoke function name."}
+	return pb.Response{Status: 403, Message: "Invalid invoke function name."}
 }
 
 func getCreator(certificate []byte) (string, string) {
-	data := certificate[strings.Index(string(certificate), "-----"): strings.LastIndex(string(certificate), "-----")+5]
+	data := certificate[strings.Index(string(certificate), "-----") : strings.LastIndex(string(certificate), "-----")+5]
 	block, _ := pem.Decode([]byte(data))
 	cert, _ := x509.ParseCertificate(block.Bytes)
 	organization := cert.Issuer.Organization[0]
