@@ -1,0 +1,105 @@
+#
+# Copyright Altoros. All Rights Reserved.
+#
+
+version: '2'
+
+services:
+
+  ca.courier1.blockchain.localhost:
+    container_name: ca.courier1.blockchain.localhost
+    image: hyperledger/fabric-ca:x86_64-1.0.6
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier1.blockchain.localhost-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/69c068dc3894e0ed2059859febce7462aacac803052f8f0cefb3218fd2fcda9e_sk
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier1.blockchain.localhost-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/69c068dc3894e0ed2059859febce7462aacac803052f8f0cefb3218fd2fcda9e_sk
+#    ports:
+#      - 8054:7054
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ../artifacts/crypto-config/peerOrganizations/courier1.blockchain.localhost/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ../artifacts/fabric-ca-server-config-courier1.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+
+  peer0.courier1.blockchain.localhost:
+    container_name: peer0.courier1.blockchain.localhost
+    extends:
+      file:   base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.courier1.blockchain.localhost
+      - CORE_PEER_LOCALMSPID=courier1MSP
+      - CORE_PEER_ADDRESS=peer0.courier1.blockchain.localhost:7051
+    ports:
+      - 8051:7051
+      - 8053:7053
+    volumes:
+        - ../artifacts/crypto-config/peerOrganizations/courier1.blockchain.localhost/peers/peer0.courier1.blockchain.localhost/:/etc/hyperledger/crypto/peer
+    depends_on:
+      - ca.courier1.blockchain.localhost
+    
+
+  peer1.courier1.blockchain.localhost:
+    container_name: peer1.courier1.blockchain.localhost
+    extends:
+      file:   base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.courier1.blockchain.localhost
+      - CORE_PEER_LOCALMSPID=courier1MSP
+      - CORE_PEER_ADDRESS=peer1.courier1.blockchain.localhost:7051
+    ports:
+      - 8056:7051
+      - 8058:7053
+    volumes:
+        - ../artifacts/crypto-config/peerOrganizations/courier1.blockchain.localhost/peers/peer1.courier1.blockchain.localhost/:/etc/hyperledger/crypto/peer
+    depends_on:
+      - ca.courier1.blockchain.localhost
+    
+
+  # fabric-rest api server
+  api.courier1.blockchain.localhost:
+    extends:
+      file: base.yaml
+      service: api-base
+    container_name: api.courier1.blockchain.localhost
+    ports:
+      - 4001:4000
+    environment:
+      - ORG=courier1
+      - PORT=4000
+    volumes:
+      - ../artifacts/api/courier1/hosts:/etc/hosts
+    depends_on:
+      - peer0.courier1.blockchain.localhost
+      - peer1.courier1.blockchain.localhost
+    
+
+  cli.blockchain.localhost:
+    container_name: cli.blockchain.localhost
+    extends:
+      file: base.yaml
+      service: cli-base
+    volumes:
+      - ../artifacts/crypto-config/ordererOrganizations/blockchain.localhost/orderers/orderer.blockchain.localhost/tls:/etc/hyperledger/crypto/orderer/tls
+
+  cli.courier1.blockchain.localhost:
+    container_name: cli.courier1.blockchain.localhost
+    extends:
+      service: cli.blockchain.localhost
+    environment:
+      - CORE_PEER_LOCALMSPID=courier1MSP
+    volumes:
+        - ../artifacts/crypto-config/peerOrganizations/courier1.blockchain.localhost/users/Admin@courier1.blockchain.localhost:/etc/hyperledger/crypto/peer
+    
+
+  # simple http server to disseminate certificates
+  www.courier1.blockchain.localhost:
+    extends:
+      file: base.yaml
+      service: www-base
+    container_name: www.courier1.blockchain.localhost
+    ports:
+      - 8082:80

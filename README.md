@@ -9,9 +9,9 @@ Seller needs to keep a separate private ledger of shipments for each of their co
 
 The projects consists of the following components:
  
-[Hyperledger Fabric network](network/README.md) between the seller and one courier company.
+[Hyperledger Fabric network](fabric-starter/README.md) between the seller and one courier company.
  
-[Chaincode](chaincode/README.md) in the seller-courier one channel.
+[Chaincode](fabric-starter/chaincode/go/shipment) in the seller-courier one channel.
 
 [Seller web app](seller/README.md) <br>
 Only seller can create a shipment and decide to which of their courier partners to pass it for delivery.
