@@ -17,8 +17,8 @@ sudo apt-get install -y docker-ce
 
 sudo groupadd docker
 sudo usermod -aG docker $USER
-sudo usermod -G docker $USER
 
 echo
 echo "---------------------------------"
-read -n1 -r -p "Relogin to the apply the user into the 'docker' group"
+echo "Relogin to apply the user into the 'docker' group"
+echo "---------------------------------"

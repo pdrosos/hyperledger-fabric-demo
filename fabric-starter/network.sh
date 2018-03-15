@@ -25,7 +25,7 @@ echo "Use target docker-compose folder: $GENERATED_DOCKER_COMPOSE_FOLDER"
 
 [[ -d $GENERATED_ARTIFACTS_FOLDER ]] || mkdir $GENERATED_ARTIFACTS_FOLDER
 [[ -d $GENERATED_DOCKER_COMPOSE_FOLDER ]] || mkdir $GENERATED_DOCKER_COMPOSE_FOLDER
-[[ -f $GENERATED_DOCKER_COMPOSE_FOLDER/base.yaml ]] || cp "$TEMPLATES_DOCKER_COMPOSE_FOLDER/base.yaml" "$GENERATED_DOCKER_COMPOSE_FOLDER"
+cp -u "$TEMPLATES_DOCKER_COMPOSE_FOLDER/base.yaml" "$GENERATED_DOCKER_COMPOSE_FOLDER"
 
 
 WGET_OPTS="--verbose -N"
@@ -34,7 +34,7 @@ COMPOSE_TEMPLATE=$TEMPLATES_DOCKER_COMPOSE_FOLDER/docker-composetemplate.yaml
 COMPOSE_FILE_DEV=$TEMPLATES_DOCKER_COMPOSE_FOLDER/docker-composedev.yaml
 
 CHAINCODE_COMMON_NAME=reference
-CHAINCODE_BILATERAL_NAME=shipment
+CHAINCODE_BILATERAL_NAME=shipment_test
 CHAINCODE_COMMON_INIT='{"Args":["init","a","100","b","100"]}'
 CHAINCODE_BILATERAL_INIT='{"Args":["init","a","100","b","100"]}'
 
@@ -292,7 +292,7 @@ function generatePeerArtifacts() {
     cp $TEMPLATES_ARTIFACTS_FOLDER/default_hosts $GENERATED_ARTIFACTS_FOLDER/api/${org}/hosts
 
     echo "Generating ${org}Config.json"
-    docker-compose --file ${f} run --rm "cli.$org.$DOMAIN" bash -c "FABRIC_CFG_PATH=./ configtxgen  -asOrg ${org}MSP > ${org}Config.json"
+    docker-compose --file ${f} run --rm "cli.$org.$DOMAIN" bash -c "FABRIC_CFG_PATH=./ configtxgen  -printOrg ${org}MSP > ${org}Config.json"
 }
 
 function addOrgToHosts() {
@@ -640,28 +640,27 @@ function downloadArtifactsOrderer() {
 # Example usage: installCliToolset "org-name"
 #
 #############################
-function installCliToolset (){
+function startConfigTxlator (){
 
   org=$1
+  stop=$2
 
-  bin/configtxlator start &
+#  bin/configtxlator start &
+#  sleep 2
+
+
+  d="cli.$org.$DOMAIN"
+  c="sudo pkill -9 configtxlator "
+
+  docker exec -d ${d} bash -c "$c"
   sleep 2
 
+  info "$org is starting configtxlator on $d by $c"
+  c="configtxlator start & "
+  [[ -z "$stop" ]] && docker exec -d ${d} bash -c "$c"
 
-#  d="cli.$org.$DOMAIN"
-#  c="apt-get update && apt-get install -y jq && pkill configtxlator"
-#
-#  info "$org is installing tools on $d by $c"
-#  docker exec ${d} bash -c "$c"
-#
-#  c="configtxlator start & sleep 1"
-#
-#  info "$org is starting configtxlator on $d by $c"
-#  docker exec -d ${d} bash -c "$c"
-#
-#  echo "waiting 5s for configtxlator to start..."
-#  sleep 5
-
+  echo "waiting 3s for configtxlator to start..."
+  sleep 3
 }
 
 function addOrg() {
@@ -690,12 +689,12 @@ function addOrg() {
   sed -e "s/DOMAIN/$DOMAIN/g" -e "s/ORG/$org/g" $TEMPLATES_ARTIFACTS_FOLDER/configtx-orgtemplate.yaml > "$configtxDir/configtx.yaml"
 
   d="cli.$org.$DOMAIN"
-  c="FABRIC_CFG_PATH=../$configtxDir configtxgen -asOrg ${org}MSP > newOrgMSP.json"
+  c="FABRIC_CFG_PATH=../$configtxDir configtxgen -printOrg ${org}MSP > newOrgMSP.json"
 
   info "$org is generating newOrgMSP.json with $d by $c"
   docker exec ${d} bash -c "$c"
 
-  installCliToolset ${ORG1}
+  startConfigTxlator ${ORG1}
 
   d="cli.$ORG1.$DOMAIN"
   c="peer channel fetch config config_block.pb -o orderer.$DOMAIN:7050 -c $channel --tls --cafile /etc/hyperledger/crypto/orderer/tls/ca.crt \
@@ -796,7 +795,7 @@ function updateChannelConfig() {
   channel=$2
   configReplacementScript=$3
 
-info " >> configReplacementScript: $configReplacementScript ..."
+  info " >> configReplacementScript: $configReplacementScript ..."
   info " >> preparing update_in_envelope.pb envelop..."
 
 #  && echo 'wc for artifacts/config_block.json: $(wc -c < artifacts/config_block.json)' \
@@ -814,24 +813,35 @@ info " >> configReplacementScript: $configReplacementScript ..."
 
   # now update the channel with the config delta envelop
 
-  command="curl -X POST --data-binary @config_block.pb http://127.0.0.1:7059/protolator/decode/common.Block | jq . > config_block.json \
+
+  cliContainerIP=`docker inspect ${d} | jq .[0].NetworkSettings.Networks.dockercompose_default.IPAddress` #"http://127.0.0.1:7059"
+  cliContainerIP="${cliContainerIP%\"}"
+  cliContainerIP="${cliContainerIP#\"}"
+  configtxlatorServer="http://${cliContainerIP}:7059"
+
+
+  startConfigTxlator ${ORG1}
+
+  command="curl -X POST --data-binary @config_block.pb ${configtxlatorServer}/protolator/decode/common.Block | jq . > config_block.json \
   && jq .data.data[0].payload.data.config config_block.json > config.json"
 
   echo $command
   eval $command
   eval "jq -s ${configReplacementScript}" > updated_config.json
 
-  command="curl -X POST --data-binary @config.json http://127.0.0.1:7059/protolator/encode/common.Config > config.pb \
-  && curl -X POST --data-binary @updated_config.json http://127.0.0.1:7059/protolator/encode/common.Config > updated_config.pb \
-  && curl -X POST -F channel=$channel -F 'original=@config.pb' -F 'updated=@updated_config.pb' http://127.0.0.1:7059/configtxlator/compute/update-from-configs > update.pb \
-  && curl -X POST --data-binary @update.pb http://127.0.0.1:7059/protolator/decode/common.ConfigUpdate | jq . > update.json \
+  command="curl -X POST --data-binary @config.json ${configtxlatorServer}/protolator/encode/common.Config > config.pb \
+  && curl -X POST --data-binary @updated_config.json ${configtxlatorServer}/protolator/encode/common.Config > updated_config.pb \
+  && curl -X POST -F channel=$channel -F 'original=@config.pb' -F 'updated=@updated_config.pb' ${configtxlatorServer}/configtxlator/compute/update-from-configs > update.pb \
+  && curl -X POST --data-binary @update.pb ${configtxlatorServer}/protolator/decode/common.ConfigUpdate | jq . > update.json \
   && echo '{\"payload\":{\"header\":{\"channel_header\":{\"channel_id\":\"$channel\",\"type\":2}},\"data\":{\"config_update\":'\`cat update.json\`'}}}' | jq . > update_in_envelope.json \
-  && curl -X POST --data-binary @update_in_envelope.json http://127.0.0.1:7059/protolator/encode/common.Envelope > update_in_envelope.pb \
+  && curl -X POST --data-binary @update_in_envelope.json ${configtxlatorServer}/protolator/encode/common.Envelope > update_in_envelope.pb \
   && echo 'Finished update_in_envelope.pb preparation!' && pkill configtxlator"
 
 
   echo $command
   eval $command
+
+  startConfigTxlator ${ORG1} stop
 
   # now update the channel with the config delta envelop
 #  d="cli.$org.$DOMAIN"
@@ -859,8 +869,6 @@ info " >> configReplacementScript: $configReplacementScript ..."
 function registerNewOrgInChannel() {
   new_org=$1
   channel=$2
-
-  installCliToolset ${ORG1}
 
   info " >> registering org $new_org in channel $channel"
 
@@ -905,7 +913,6 @@ function registerNewOrgInChannel() {
 function updateSignPolicyForChannel() {
   org=$1
   channel=$2
-  installCliToolset ${org}
 
   policyName="${org}Only"
   orgMsp="${org}MSP"
@@ -1166,15 +1173,16 @@ elif [ "${MODE}" == "up-one-org" ]; then # params: -o ORG -M mainOrg -k CHANNELS
   fi
 elif [ "${MODE}" == "update-sign-policy" ]; then # params: -o ORG -k common_channel
   updateSignPolicyForChannel $ORG $CHANNELS
-elif [ "${MODE}" == "register-new-org" ]; then # params: -o ORG -m MAIN_ORG -i IP; example: ./network.sh -m register-new-org -o testOrg -i 172.12.34.56
+elif [ "${MODE}" == "register-new-org" ]; then # params: -o ORG -M MAIN_ORG -i IP; example: ./network.sh -m register-new-org -o testOrg -i 172.12.34.56
   [[ -z "${ORG}" ]] && echo "missing required argument -o ORG: organization name to register in system" && exit 1
   [[ -z "${IP}" ]] && echo "missing required argument -i IP: ip address of the machine being registered" && exit 1
   common_channels=("$CHANNELS")
-  registerNewOrg ${ORG} ${ORG1} ${IP} "${common_channels[@]}"
+  echo "Add new org to channels: $common_channels"
+  registerNewOrg ${ORG} ${MAIN_ORG} ${IP} "${common_channels[@]}"
   addOrgToNetworkConfig ${ORG}
   copyNetworkConfigToWWW
-  addOrgToHosts $ORG1 $ORG $IP #todo: remove ORG1 dependency
-  dockerContainerRestart $ORG1 api #todo: remove ORG1 dependency
+  addOrgToHosts ${MAIN_ORG} ${ORG} ${IP}
+  dockerContainerRestart ${MAIN_ORG} api
 elif [ "${MODE}" == "add-org-connectivity" ]; then # params: -M remoteOrg -o thisOrg -i IP
   addOrgToHosts $ORG $MAIN_ORG $IP
 elif [ "${MODE}" == "restart-api" ]; then # params:  -o ORG -i IP
