@@ -1,4 +1,4 @@
-package main
+package chaincode
 
 import (
 	//"bytes"
@@ -19,22 +19,22 @@ type ShipmentHistoryItem struct {
 
 type ShipmentHistory []ShipmentHistoryItem
 
-func (this ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 1 {
 		errorMessage := "Incorrect number of arguments. Expecting 1"
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
 	id := args[0]
 
-	logger.Debugf("Start getShipmentHistory for shipment ID %s", id)
+	this.logger.Debugf("Start getShipmentHistory for shipment ID %s", id)
 
 	resultsIterator, err := stub.GetHistoryForKey(id)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to get shipment ID %s history: %s", id, err.Error())
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
@@ -52,7 +52,7 @@ func (this ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfac
 		response, err := resultsIterator.Next()
 		if err != nil {
 			errorMessage := fmt.Sprintf("Unable to get shipment ID %s next result: %s", id, err.Error())
-			logger.Error(errorMessage)
+			this.logger.Error(errorMessage)
 
 			return shim.Error(errorMessage)
 		}
@@ -105,13 +105,13 @@ func (this ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfac
 	historyBytes, err := json.Marshal(history)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to marshal shipment ID %s history: %s", id, err.Error())
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
 	//logger.Debugf("End getShipmentHistory for shipment ID %s: %s", id, buffer.String())
-	logger.Debugf("End getShipmentHistory for shipment ID %s: %s", id, string(historyBytes))
+	this.logger.Debugf("End getShipmentHistory for shipment ID %s: %s", id, string(historyBytes))
 
 	//return shim.Success(buffer.Bytes())
 	return shim.Success(historyBytes)

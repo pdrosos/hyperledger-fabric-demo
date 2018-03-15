@@ -1,4 +1,4 @@
-package main
+package model
 
 type Address struct {
 	Country  string `json:"country"`

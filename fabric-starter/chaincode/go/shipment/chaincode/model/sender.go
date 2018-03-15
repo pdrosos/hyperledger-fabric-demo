@@ -1,8 +1,8 @@
-package main
+package model
 
-type Recipient struct {
+type Sender struct {
 	FirstName string  `json:"firstName"`
 	LastName  string  `json:"lastName"`
-	Address   Address `json:"address"`
+	Address
 	Phone     string  `json:"phone"`
 }

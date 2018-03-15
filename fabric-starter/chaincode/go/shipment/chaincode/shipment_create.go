@@ -1,79 +1,60 @@
-package main
+package chaincode
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
+
+	"github.com/pdrosos/hyperledger-fabric-demo/fabric-starter/chaincode/go/shipment/chaincode/model"
 )
 
-func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	logger.Debug("Start createShipment")
+func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	this.logger.Debug("Start createShipment")
 
 	var err error
 
-	// only seller organization can create shipments
-	creatorBytes, err := stub.GetCreator()
+	// validate transaction creator
+	err = this.requireSellerCreator(stub)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Unable to get transaction creator: %s", err.Error())
-		logger.Error(errorMessage)
-
-		return shim.Error(errorMessage)
-	}
-
-	name, org := getCreator(creatorBytes)
-	if org != "seller" {
-		errorMessage := fmt.Sprintf("Only seller organization can create shipments, called by %s@s", name, org)
-		logger.Error(errorMessage)
-
-		return shim.Error(errorMessage)
+		return shim.Error(err.Error())
 	}
 
 	// validate arguments
-	if len(args) != 11 {
-		errorMessage := "Incorrect number of arguments. Expecting 11"
-		logger.Error(errorMessage)
-
-		return shim.Error(errorMessage)
-	}
-
-	for index, element := range args {
-		if len(element) <= 0 {
-			errorMessage := fmt.Sprintf("Argument %s must be a non-empty string", index+1)
-			logger.Error(errorMessage)
-
-			return shim.Error(errorMessage)
-		}
+	err = this.validateArgumentsNotEmpty(11, args)
+	if err != nil {
+		return shim.Error(err.Error())
 	}
 
 	id := args[0]
 	trackingCode := args[1]
 
-	courier := Courier{}
+	courier := model.Courier{}
 	err = json.Unmarshal([]byte(args[2]), &courier)
 	if err != nil {
 		errorMessage := "Unable to unmarshal Courier data"
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
-	sender := Sender{}
+	sender := model.Sender{}
 	err = json.Unmarshal([]byte(args[3]), &sender)
 	if err != nil {
 		errorMessage := "Unable to unmarshal Sender data"
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
-	recipient := Recipient{}
+	recipient := model.Recipient{}
 	err = json.Unmarshal([]byte(args[4]), &recipient)
 	if err != nil {
 		errorMessage := "Unable to unmarshal Recipient data"
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
@@ -81,18 +62,18 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	weightInGrams, err := strconv.Atoi(args[5])
 	if err != nil {
 		errorMessage := "6th argument weightInGrams must be a numeric string"
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
 	shippingType := args[6]
 
-	size := Size{}
+	size := model.Size{}
 	err = json.Unmarshal([]byte(args[7]), &size)
 	if err != nil {
 		errorMessage := "Unable to unmarshal Size data"
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
@@ -102,7 +83,7 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	isFragile, err := strconv.ParseBool(args[9])
 	if err != nil {
 		errorMessage := "10th argument isFragile must be a boolean representing string"
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
@@ -113,7 +94,7 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	shipmentAsBytes, err := stub.GetState(id)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Failed to get shipment ID %s: %s", id, err.Error())
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	} else if shipmentAsBytes != nil {
@@ -123,7 +104,7 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	}
 
 	// create new shipment and marshal it to JSON
-	shipment := NewShipment(
+	shipment := model.NewShipment(
 		id,
 		trackingCode,
 		courier,
@@ -140,7 +121,7 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	shipmentJSONAsBytes, err := json.Marshal(shipment)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to marshal shipment as JSON: %s", err.Error())
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
@@ -149,7 +130,7 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	err = stub.PutState(id, shipmentJSONAsBytes)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to put shipment JSON bytes to state: %s", err.Error())
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
@@ -163,7 +144,7 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	trackingCodeIdIndexKey, err := stub.CreateCompositeKey(indexName, []string{shipment.TrackingCode, shipment.Id})
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to create shipment trackingCode-id composite key: %s", err.Error())
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
@@ -174,12 +155,30 @@ func (this ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, a
 	err = stub.PutState(trackingCodeIdIndexKey, value)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to put shipment ID %s index trackingCode-id to state: %s", shipment.Id, err.Error())
-		logger.Error(errorMessage)
+		this.logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
-	logger.Debug("End createShipment")
+	this.logger.Debug("End createShipment")
 
 	return shim.Success(nil)
+}
+
+func (this *ShipmentChaincode) requireSellerCreator(stub shim.ChaincodeStubInterface) error {
+	// only seller organization can create shipments
+	creatorBytes, err := this.getTransactionCreator(stub)
+	if err != nil {
+		return err
+	}
+
+	name, org := this.getCreator(creatorBytes)
+	if org != "seller" {
+		errorMessage := fmt.Sprintf("Only seller organization can create shipments, called by %s@s", name, org)
+		this.logger.Error(errorMessage)
+
+		return errors.New(errorMessage)
+	}
+
+	return nil
 }
