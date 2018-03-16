@@ -8,14 +8,14 @@ services:
 
   ca.courier1.blockchain.localhost:
     container_name: ca.courier1.blockchain.localhost
-    image: hyperledger/fabric-ca:x86_64-1.1.0-rc1
+    image: hyperledger/fabric-ca:x86_64-1.1.0
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier1.blockchain.localhost-cert.pem
-      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9c7bac96e9a00388d53b15b9f360a581317e2ee1e6aa4b0894293d120beec841_sk
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/b82709c417b1b4197b4ca9b8dbdeb719941c589b67eacb13a41df6d85987289d_sk
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.courier1.blockchain.localhost-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9c7bac96e9a00388d53b15b9f360a581317e2ee1e6aa4b0894293d120beec841_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/b82709c417b1b4197b4ca9b8dbdeb719941c589b67eacb13a41df6d85987289d_sk
 #    ports:
 #      - 8054:7054
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'

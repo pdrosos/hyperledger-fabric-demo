@@ -8,7 +8,7 @@ services:
 
   orderer.blockchain.localhost:
     container_name: orderer.blockchain.localhost
-    image: hyperledger/fabric-orderer:x86_64-1.1.0-rc1
+    image: hyperledger/fabric-orderer:x86_64-1.1.0
     environment:
       - ORDERER_GENERAL_LOGLEVEL=debug
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
