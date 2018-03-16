@@ -162,6 +162,9 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 		return shim.Error(errorJson)
 	}
 
+	// send shipment-created event to the SDK
+	stub.SetEvent("shipment-created", shipmentJSONAsBytes)
+
 	logger.Debug("End createShipment")
 
 	return shim.Success(nil)
