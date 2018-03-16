@@ -1,4 +1,4 @@
-package model
+package main
 
 type Courier struct {
 	CourierId   string `json:"courierId"`

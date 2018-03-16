@@ -1,4 +1,4 @@
-package chaincode
+package main
 
 import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -6,9 +6,9 @@ import (
 )
 
 func (this *ShipmentChaincode) getAllShipments(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	this.logger.Debug("Start getAllShipments")
+	logger.Debug("Start getAllShipments")
 
-	this.logger.Debug("End getAllShipments")
+	logger.Debug("End getAllShipments")
 
 	return shim.Success(nil)
 }

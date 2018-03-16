@@ -1,4 +1,4 @@
-package chaincode
+package main
 
 import (
 	"crypto/x509"
@@ -11,45 +11,40 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-func NewShipmentChaincode(logger shim.ChaincodeLogger) *ShipmentChaincode {
-	return &ShipmentChaincode{
-		logger: logger,
-	}
-}
+var logger = shim.NewLogger("ShipmentChaincode")
 
 type ShipmentChaincode struct {
-	logger shim.ChaincodeLogger
 }
 
 func (this *ShipmentChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	this.logger.Debug("Init")
+	logger.Debug("Init")
 
 	creatorBytes, err := stub.GetCreator()
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to get chaincode creator: %s", err.Error())
-		this.logger.Error(errorMessage)
+		logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
 	name, org := this.getCreator(creatorBytes)
-	this.logger.Debug(fmt.Sprintf("Chaincode creator: %s@%s", name, org))
+	logger.Debug(fmt.Sprintf("Chaincode creator: %s@%s", name, org))
 
 	return shim.Success(nil)
 }
 
 func (this *ShipmentChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-	this.logger.Debug("Invoke")
+	logger.Debug("Invoke")
 	creatorBytes, err := stub.GetCreator()
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to get transaction creator: %s", err.Error())
-		this.logger.Error(errorMessage)
+		logger.Error(errorMessage)
 
 		return shim.Error(errorMessage)
 	}
 
 	name, org := this.getCreator(creatorBytes)
-	this.logger.Debug("Transaction creator " + name + "@" + org)
+	logger.Debug("Transaction creator " + name + "@" + org)
 
 	function, args := stub.GetFunctionAndParameters()
 	if function == "createShipment" {
@@ -73,7 +68,7 @@ func (this *ShipmentChaincode) getTransactionCreator(stub shim.ChaincodeStubInte
 	creatorBytes, err := stub.GetCreator()
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to get transaction creator: %s", err.Error())
-		this.logger.Error(errorMessage)
+		logger.Error(errorMessage)
 
 		return nil, errors.New(errorMessage)
 	}
@@ -88,7 +83,7 @@ func (this *ShipmentChaincode) getCreator(certificate []byte) (string, string) {
 	organization := cert.Issuer.Organization[0]
 	commonName := cert.Subject.CommonName
 
-	this.logger.Debug("commonName: " + commonName + ", organization: " + organization)
+	logger.Debug("commonName: " + commonName + ", organization: " + organization)
 
 	organizationShort := strings.Split(organization, ".")[0]
 
@@ -98,7 +93,7 @@ func (this *ShipmentChaincode) getCreator(certificate []byte) (string, string) {
 func (this *ShipmentChaincode) validateArgumentsNotEmpty(argsCount int, args []string) error {
 	if len(args) != argsCount {
 		errorMessage := fmt.Sprintf("Incorrect number of arguments. Expecting %s", argsCount)
-		this.logger.Error(errorMessage)
+		logger.Error(errorMessage)
 
 		return errors.New(errorMessage)
 	}
@@ -106,11 +101,19 @@ func (this *ShipmentChaincode) validateArgumentsNotEmpty(argsCount int, args []s
 	for index, element := range args {
 		if len(element) <= 0 {
 			errorMessage := fmt.Sprintf("Argument %s must be a non-empty string", index+1)
-			this.logger.Error(errorMessage)
+			logger.Error(errorMessage)
 
 			return errors.New(errorMessage)
 		}
 	}
 
 	return nil
+}
+
+func main() {
+	shipmentChaincode := new(ShipmentChaincode)
+	err := shim.Start(shipmentChaincode)
+	if err != nil {
+		logger.Error(err.Error())
+	}
 }

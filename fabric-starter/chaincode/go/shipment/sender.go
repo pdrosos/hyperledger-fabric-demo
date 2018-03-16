@@ -1,4 +1,4 @@
-package model
+package main
 
 type Sender struct {
 	FirstName string  `json:"firstName"`

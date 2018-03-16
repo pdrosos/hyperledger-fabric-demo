@@ -1,4 +1,4 @@
-package model
+package main
 
 type Size struct {
 	HeightInMM int `json:"heightInMM"`
