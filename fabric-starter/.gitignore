@@ -27,3 +27,6 @@ build
 /artifacts/config.*
 /artifacts/config_block.*
 /artifacts/newOrgMSP.json
+
+# the shipment chaincode binary
+/chaincode/go/shipment/shipment
