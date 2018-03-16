@@ -86,14 +86,14 @@ Now, compile your chaincode:
 
 .. code:: bash
 
-  cd go/chaincode_example02
-  go build -o chaincode_example02
+  cd go/shipment
+  go build -o shipment
 
 Now run the chaincode:
 
 .. code:: bash
 
-  CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=mycc:0 ./chaincode_example02
+  CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=shipment:0 ./shipment
 
 The chaincode is started with peer and chaincode logs indicating successful registration with the peer.
 Note that at this stage the chaincode is not associated with any channel. This is done in subsequent steps
@@ -114,20 +114,20 @@ We'll leverage the CLI container to drive these calls.
 
 .. code:: bash
 
-  peer chaincode install -p chaincodedev/chaincode/go/chaincode_example02 -n mycc -v 0
-  peer chaincode instantiate -n mycc -v 0 -c '{"Args":["move","a","100","b","200"]}' -C myc
+  peer chaincode install -p chaincodedev/chaincode/go/shipment -n shipment -v 0
+  peer chaincode instantiate -n shipment -v 0 -c '{"Args":[]}' -C myc
 
 Now issue an invoke to move ``10`` from ``a`` to ``b``.
 
 .. code:: bash
 
-  peer chaincode invoke -n mycc -c '{"Args":["invoke","a","b","10"]}' -C myc
+  peer chaincode invoke -n shipment -c '{"Args":["invoke","a","b","10"]}' -C myc
 
 Finally, query ``a``.  We should see a value of ``90``.
 
 .. code:: bash
 
-  peer chaincode query -n mycc -c '{"Args":["query","a"]}' -C myc
+  peer chaincode query -n shipment -c '{"Args":["getShipmentById","asd"]}' -C myc
 
 Testing new chaincode
 ---------------------

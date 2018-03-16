@@ -31,7 +31,7 @@ cp -u "$TEMPLATES_DOCKER_COMPOSE_FOLDER/base.yaml" "$GENERATED_DOCKER_COMPOSE_FO
 WGET_OPTS="--verbose -N"
 CLI_TIMEOUT=10000
 COMPOSE_TEMPLATE=$TEMPLATES_DOCKER_COMPOSE_FOLDER/docker-composetemplate.yaml
-COMPOSE_FILE_DEV=$TEMPLATES_DOCKER_COMPOSE_FOLDER/docker-composedev.yaml
+COMPOSE_FILE_DEV=$FABRIC_STARTER_HOME/chaincode-docker-devmode/docker-compose-simple.yaml
 
 CHAINCODE_COMMON_NAME=reference
 CHAINCODE_BILATERAL_NAME=shipment_test
@@ -988,20 +988,24 @@ function devNetworkDown () {
   docker-compose -f ${COMPOSE_FILE_DEV} down
 }
 
+function devBuildAndStart () {
+  docker-compose -f ${COMPOSE_FILE_DEV} run chaincode bash -c "cd go/shipment && go build -o shipment && CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=shipment:0 ./shipment"
+}
+
 function devInstall () {
-  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode install -p relationship -n mycc -v 0"
+  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode install -p chaincodedev/chaincode/go/shipment -n shipment -v 0"
 }
 
 function devInstantiate () {
-  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode instantiate -n mycc -v 0 -C myc -c '{\"Args\":[\"init\",\"a\",\"999\",\"b\",\"100\"]}'"
+  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode instantiate -n shipment -v 0 -c '{\"Args\":[]}' -C myc"
 }
 
 function devInvoke () {
-  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode invoke -n mycc -v 0 -C myc -c '{\"Args\":[\"move\",\"a\",\"b\",\"10\"]}'"
+  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode invoke -n shipment -v 0 -C myc -c '{\"Args\":[\"move\",\"a\",\"b\",\"10\"]}'"
 }
 
 function devQuery () {
-  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode query -n mycc -v 0 -C myc -c '{\"Args\":[\"query\",\"a\"]}'"
+  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode query -n shipment -c '{\"Args\":[\"getShipmentById\",\"asd\"]}' -C myc"
 }
 
 function info() {
@@ -1260,6 +1264,8 @@ elif [ "${MODE}" == "logs" ]; then
   logs ${ORG}
 elif [ "${MODE}" == "devup" ]; then
   devNetworkUp
+elif [ "${MODE}" == "devbuildandstart" ]; then
+  devBuildAndStart
 elif [ "${MODE}" == "devinstall" ]; then
   devInstall
 elif [ "${MODE}" == "devinstantiate" ]; then
