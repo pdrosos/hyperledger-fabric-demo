@@ -10,14 +10,14 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-type ShipmentHistoryItem struct {
+type ShipmentHistoryRecord struct {
 	TxId      string
 	Value     string
 	Timestamp string
 	IsDelete  bool
 }
 
-type ShipmentHistory []ShipmentHistoryItem
+type ShipmentHistory []ShipmentHistoryRecord
 
 func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	var err error
@@ -28,13 +28,13 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 		return shim.Error(err.Error())
 	}
 
-	id := args[0]
+	trackingCode := args[0]
 
-	logger.Debugf("Start getShipmentHistory for shipment ID %s", id)
+	logger.Debugf("Start getShipmentHistory for shipment %s", trackingCode)
 
-	resultsIterator, err := stub.GetHistoryForKey(id)
+	resultsIterator, err := stub.GetHistoryForKey(trackingCode)
 	if err != nil {
-		errorJson := this.errorJson(fmt.Sprintf("Unable to get shipment ID %s history: %s", id, err.Error()))
+		errorJson := this.errorJson(fmt.Sprintf("Unable to get shipment %s history: %s", trackingCode, err.Error()))
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
@@ -53,7 +53,7 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 		response, err := resultsIterator.Next()
 		if err != nil {
 			errorJson := this.errorJson(
-				fmt.Sprintf("Unable to get shipment ID %s next result: %s", id, err.Error()),
+				fmt.Sprintf("Unable to get shipment %s next result: %s", trackingCode, err.Error()),
 			)
 			logger.Error(errorJson)
 
@@ -93,20 +93,20 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 		//buffer.WriteString("}")
 		//bArrayMemberAlreadyWritten = true
 
-		historyItem := ShipmentHistoryItem{
+		historyRecord := ShipmentHistoryRecord{
 			TxId:      response.TxId,
 			Value:     string(response.Value),
 			Timestamp: time.Unix(response.Timestamp.Seconds, int64(response.Timestamp.Nanos)).String(),
 			IsDelete:  response.IsDelete,
 		}
 
-		history = append(history, historyItem)
+		history = append(history, historyRecord)
 	}
 
 	//buffer.WriteString("]")
 
 	if history == nil {
-		errorJson := this.errorJson(fmt.Sprintf("Shipment ID %s does not exist", id))
+		errorJson := this.errorJson(fmt.Sprintf("Shipment %s does not exist", trackingCode))
 		logger.Error(errorJson)
 
 		return pb.Response{Status: 404, Message: errorJson}
@@ -115,15 +115,15 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 	historyBytes, err := json.Marshal(history)
 	if err != nil {
 		errorJson := this.errorJson(
-			fmt.Sprintf("Unable to marshal shipment ID %s history: %s", id, err.Error()),
+			fmt.Sprintf("Unable to marshal shipment %s history: %s", trackingCode, err.Error()),
 		)
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
 	}
 
-	//logger.Debugf("End getShipmentHistory for shipment ID %s: %s", id, buffer.String())
-	logger.Debugf("End getShipmentHistory for shipment ID %s: %s", id, string(historyBytes))
+	//logger.Debugf("End getShipmentHistory for shipment %s: %s", trackingCode, buffer.String())
+	logger.Debugf("End getShipmentHistory for shipment %s: %s", trackingCode, string(historyBytes))
 
 	//return shim.Success(buffer.Bytes())
 	return shim.Success(historyBytes)

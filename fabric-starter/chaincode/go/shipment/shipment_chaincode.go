@@ -54,15 +54,18 @@ func (this *ShipmentChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Respo
 		return this.updateShipment(stub, args)
 	} else if function == "changeShipmentStateAndLocation" {
 		return this.changeShipmentStateAndLocation(stub, args)
-	} else if function == "getShipmentById" {
-		return this.getShipmentById(stub, args)
+	} else if function == "getShipmentByTrackingCode" {
+		return this.getShipmentByTrackingCode(stub, args)
 	} else if function == "getAllShipments" {
 		return this.getAllShipments(stub, args)
 	} else if function == "getShipmentHistory" {
 		return this.getShipmentHistory(stub, args)
 	}
 
-	return pb.Response{Status: 403, Message: "Invalid invoke function name."}
+	errorJson := this.errorJson(fmt.Sprintf("Invalid invoke function name: %s", function))
+	logger.Error(errorJson)
+
+	return pb.Response{Status: 403, Message: errorJson}
 }
 
 func (this *ShipmentChaincode) getTransactionCreator(stub shim.ChaincodeStubInterface) ([]byte, error) {

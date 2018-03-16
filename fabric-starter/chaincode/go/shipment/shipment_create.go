@@ -22,16 +22,15 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	}
 
 	// validate arguments
-	err = this.validateArgumentsNotEmpty(11, args)
+	err = this.validateArgumentsNotEmpty(10, args)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	id := args[0]
-	trackingCode := args[1]
+	trackingCode := args[0]
 
 	courier := Courier{}
-	err = json.Unmarshal([]byte(args[2]), &courier)
+	err = json.Unmarshal([]byte(args[1]), &courier)
 	if err != nil {
 		errorJson := this.errorJson("Unable to unmarshal Courier data")
 		logger.Error(errorJson)
@@ -40,7 +39,7 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	}
 
 	sender := Sender{}
-	err = json.Unmarshal([]byte(args[3]), &sender)
+	err = json.Unmarshal([]byte(args[2]), &sender)
 	if err != nil {
 		errorJson := this.errorJson("Unable to unmarshal Sender data")
 		logger.Error(errorJson)
@@ -49,7 +48,7 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	}
 
 	recipient := Recipient{}
-	err = json.Unmarshal([]byte(args[4]), &recipient)
+	err = json.Unmarshal([]byte(args[3]), &recipient)
 	if err != nil {
 		errorJson := this.errorJson("Unable to unmarshal Recipient data")
 		logger.Error(errorJson)
@@ -57,18 +56,18 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 		return shim.Error(errorJson)
 	}
 
-	weightInGrams, err := strconv.Atoi(args[5])
+	weightInGrams, err := strconv.Atoi(args[4])
 	if err != nil {
-		errorJson := this.errorJson("6th argument weightInGrams must be a numeric string")
+		errorJson := this.errorJson("5th argument weightInGrams must be a numeric string")
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
 	}
 
-	shippingType := args[6]
+	shippingType := args[5]
 
 	size := Size{}
-	err = json.Unmarshal([]byte(args[7]), &size)
+	err = json.Unmarshal([]byte(args[6]), &size)
 	if err != nil {
 		errorJson := this.errorJson("Unable to unmarshal Size data")
 		logger.Error(errorJson)
@@ -76,27 +75,27 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 		return shim.Error(errorJson)
 	}
 
-	content := args[8]
+	content := args[7]
 
-	isFragile, err := strconv.ParseBool(args[9])
+	isFragile, err := strconv.ParseBool(args[8])
 	if err != nil {
-		errorJson := this.errorJson("10th argument isFragile must be a boolean representing string")
+		errorJson := this.errorJson("9th argument isFragile must be a boolean representing string")
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
 	}
 
-	lastState := args[10]
+	lastState := args[9]
 
 	// check if shipment already exists
-	shipmentAsBytes, err := stub.GetState(id)
+	shipmentAsBytes, err := stub.GetState(trackingCode)
 	if err != nil {
-		errorJson := this.errorJson(fmt.Sprintf("Failed to get shipment ID %s: %s", id, err.Error()))
+		errorJson := this.errorJson(fmt.Sprintf("Failed to get shipment %s: %s", trackingCode, err.Error()))
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
 	} else if shipmentAsBytes != nil {
-		errorJson := this.errorJson(fmt.Sprintf("Shipment ID %s already exists" + id))
+		errorJson := this.errorJson(fmt.Sprintf("Shipment %s already exists" + trackingCode))
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
@@ -104,7 +103,6 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 
 	// create new shipment and marshal it to JSON
 	shipment := NewShipment(
-		id,
 		trackingCode,
 		courier,
 		sender,
@@ -126,7 +124,7 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	}
 
 	// save shipment to state
-	err = stub.PutState(id, shipmentJSONAsBytes)
+	err = stub.PutState(trackingCode, shipmentJSONAsBytes)
 	if err != nil {
 		errorJson := this.errorJson(fmt.Sprintf("Unable to put shipment JSON bytes to state: %s", err.Error()))
 		logger.Error(errorJson)
@@ -137,13 +135,14 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	//  Index the shipment to enable tracking code queries
 	//  An 'index' is a normal key/value entry in state.
 	//  The key is a composite key, with the elements that you want to range query on listed first.
-	//  In our case, the composite key is based on indexName~trackingCode~id.
-	//  This will enable very efficient state range queries based on composite keys matching indexName~trackingCode~*
-	indexName := "trackingCode-id"
-	trackingCodeIdIndexKey, err := stub.CreateCompositeKey(indexName, []string{shipment.TrackingCode, shipment.Id})
+	//  In our case, the composite key is based on indexName~createdAtDate~trackingCode.
+	//  This will enable very efficient state range queries based on composite keys matching indexName~createdAtDate~*
+	indexName := "createdAtDate-trackingCode"
+	createdAtDate := shipment.CreatedAt.Format("2006-01-02 15:04:05")
+	createdAtDateTrackingCodeIndexKey, err := stub.CreateCompositeKey(indexName, []string{createdAtDate, shipment.TrackingCode})
 	if err != nil {
 		errorJson := this.errorJson(
-			fmt.Sprintf("Unable to create shipment trackingCode-id composite key: %s", err.Error()),
+			fmt.Sprintf("Unable to create shipment createdAtDate-trackingCode composite key: %s", err.Error()),
 		)
 		logger.Error(errorJson)
 
@@ -153,10 +152,10 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	//  Save index entry to state. Only the key name is needed, no need to store a duplicate copy of the shipment.
 	//  Note - passing a 'nil' value will effectively delete the key from state, therefore we pass null character as value
 	value := []byte{0x00}
-	err = stub.PutState(trackingCodeIdIndexKey, value)
+	err = stub.PutState(createdAtDateTrackingCodeIndexKey, value)
 	if err != nil {
 		errorJson := this.errorJson(
-			fmt.Sprintf("Unable to put shipment ID %s index trackingCode-id to state: %s", shipment.Id, err.Error()),
+			fmt.Sprintf("Unable to put shipment %s index createdAtDate-trackingCode to state: %s", shipment.TrackingCode, err.Error()),
 		)
 		logger.Error(errorJson)
 

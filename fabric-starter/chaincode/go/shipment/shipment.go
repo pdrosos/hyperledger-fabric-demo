@@ -5,7 +5,6 @@ import (
 )
 
 type Shipment struct {
-	Id                  string    `json:"id"`
 	TrackingCode        string    `json:"trackingCode"`
 	Courier             Courier   `json:"courier"`
 	Sender              Sender    `json:"sender"`
@@ -22,8 +21,14 @@ type Shipment struct {
 	UpdatedAt           time.Time `json:"updatedAt"`
 }
 
+type ShipmentRecord struct {
+	Key   string
+	Value string
+}
+
+type Shipments []ShipmentRecord
+
 func NewShipment(
-	id string,
 	trackingCode string,
 	courier Courier,
 	sender Sender,
@@ -38,7 +43,6 @@ func NewShipment(
 	createdAt := time.Now().UTC()
 
 	shipment := &Shipment{
-		Id:                  id,
 		TrackingCode:        trackingCode,
 		Courier:             courier,
 		Sender:              sender,
