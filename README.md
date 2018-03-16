@@ -11,13 +11,20 @@ The projects consists of the following components:
  
 [Hyperledger Fabric network](fabric-starter/README.md) between the seller and one courier company.
  
-[Chaincode](fabric-starter/chaincode/go/shipment) in the seller-courier one channel.
+[Chaincode](fabric-starter/chaincode/go/shipment) installed in the seller-courier1 channel.
 
-[Seller web app](seller/README.md) <br>
+[Seller api and web app](seller/api/README.md) <br>
 Only seller can create a shipment and decide to which of their courier partners to pass it for delivery.
 
-[Courier web app](courier/README.md) <br>
-Only courier can change the shipment status and current location, once they receive it from the seller.
+[Courier api and web app](courier/api/README.md) <br>
+Only courier can change the shipment state and current location, once they receive it from the seller.
 
-[Customer web app](customer/README.md) <br>
+[Customer api and web app](customer/api/README.md) <br>
 Seller's customer know their own tracking codes and should have a way to track current shipment location and history in real time.
+
+## Acknowledgements
+
+The Hyperledger Fabric network uses a very helpful [fabric-starter](https://github.com/olegabu/fabric-starter) script, which integrates [fabric-rest](https://github.com/Altoros/fabric-rest) REST API server and admin web app.
+
+The scripts are inspired by [first-network](https://github.com/hyperledger/fabric-samples/tree/release/first-network) and 
+ [balance-transfer](https://github.com/hyperledger/fabric-samples/tree/release/balance-transfer) of Hyperledger Fabric samples.

@@ -34,7 +34,7 @@ COMPOSE_TEMPLATE=$TEMPLATES_DOCKER_COMPOSE_FOLDER/docker-composetemplate.yaml
 COMPOSE_FILE_DEV=$FABRIC_STARTER_HOME/chaincode-docker-devmode/docker-compose-simple.yaml
 
 CHAINCODE_COMMON_NAME=reference
-CHAINCODE_BILATERAL_NAME=shipment_test
+CHAINCODE_BILATERAL_NAME=shipment
 CHAINCODE_COMMON_INIT='{"Args":["init","a","100","b","100"]}'
 CHAINCODE_BILATERAL_INIT='{"Args":["init","a","100","b","100"]}'
 
