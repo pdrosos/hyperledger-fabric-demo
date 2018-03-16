@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -9,11 +8,12 @@ import (
 )
 
 func (this *ShipmentChaincode) getShipmentById(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
-		errorMessage := "Incorrect number of arguments. Expecting 1"
-		logger.Error(errorMessage)
+	var err error
 
-		return shim.Error(errorMessage)
+	// validate arguments
+	err = this.validateArgumentsNotEmpty(1, args)
+	if err != nil {
+		return shim.Error(err.Error())
 	}
 
 	id := args[0]
@@ -22,19 +22,15 @@ func (this *ShipmentChaincode) getShipmentById(stub shim.ChaincodeStubInterface,
 
 	shipmentAsBytes, err := stub.GetState(id)
 	if err != nil {
-		stateError := &Error{
-			Error: fmt.Sprintf("Failed to get state for shipment ID %s", id),
-		}
-		jsonResponse, _ := json.Marshal(stateError)
+		errorJson := this.errorJson(fmt.Sprintf("Failed to get state for shipment ID %s", id))
+		logger.Error(errorJson)
 
-		return shim.Error(string(jsonResponse))
+		return shim.Error(errorJson)
 	} else if shipmentAsBytes == nil {
-		notFoundError := &Error{
-			Error: fmt.Sprintf("Shipment ID %s does not exist", id),
-		}
-		jsonResponse, _ := json.Marshal(notFoundError)
+		errorJson := this.errorJson(fmt.Sprintf("Shipment ID %s does not exist", id))
+		logger.Error(errorJson)
 
-		return pb.Response{Status: 404, Message: string(jsonResponse)}
+		return pb.Response{Status: 404, Message: errorJson}
 	}
 
 	logger.Debugf("End getShipmentById for shipment ID %s: %s", id, string(shipmentAsBytes))

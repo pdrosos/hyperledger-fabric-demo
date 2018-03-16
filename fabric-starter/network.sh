@@ -1005,7 +1005,7 @@ function devInvoke () {
 }
 
 function devQuery () {
-  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode query -n shipment -c '{\"Args\":[\"getShipmentById\",\"asd\"]}' -C myc"
+  docker-compose -f ${COMPOSE_FILE_DEV} run cli bash -c "peer chaincode query -n shipment -c '{\"Args\":[\"getShipmentHistory\",\"asd\"]}' -C myc"
 }
 
 function info() {

@@ -20,11 +20,12 @@ type ShipmentHistoryItem struct {
 type ShipmentHistory []ShipmentHistoryItem
 
 func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
-		errorMessage := "Incorrect number of arguments. Expecting 1"
-		logger.Error(errorMessage)
+	var err error
 
-		return shim.Error(errorMessage)
+	// validate arguments
+	err = this.validateArgumentsNotEmpty(1, args)
+	if err != nil {
+		return shim.Error(err.Error())
 	}
 
 	id := args[0]
@@ -33,15 +34,15 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 
 	resultsIterator, err := stub.GetHistoryForKey(id)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Unable to get shipment ID %s history: %s", id, err.Error())
-		logger.Error(errorMessage)
+		errorJson := this.errorJson(fmt.Sprintf("Unable to get shipment ID %s history: %s", id, err.Error()))
+		logger.Error(errorJson)
 
-		return shim.Error(errorMessage)
+		return shim.Error(errorJson)
 	}
 
 	defer resultsIterator.Close()
 
-	var history ShipmentHistory
+	var history ShipmentHistory = make([]ShipmentHistoryItem, 0)
 
 	// buffer is a JSON array containing historic values for the shipment
 	//var buffer bytes.Buffer
@@ -51,10 +52,12 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 	for resultsIterator.HasNext() {
 		response, err := resultsIterator.Next()
 		if err != nil {
-			errorMessage := fmt.Sprintf("Unable to get shipment ID %s next result: %s", id, err.Error())
-			logger.Error(errorMessage)
+			errorJson := this.errorJson(
+				fmt.Sprintf("Unable to get shipment ID %s next result: %s", id, err.Error()),
+			)
+			logger.Error(errorJson)
 
-			return shim.Error(errorMessage)
+			return shim.Error(errorJson)
 		}
 
 		//// Add a comma before array members, suppress it for the first array member
@@ -104,10 +107,12 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 
 	historyBytes, err := json.Marshal(history)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Unable to marshal shipment ID %s history: %s", id, err.Error())
-		logger.Error(errorMessage)
+		errorJson := this.errorJson(
+			fmt.Sprintf("Unable to marshal shipment ID %s history: %s", id, err.Error()),
+		)
+		logger.Error(errorJson)
 
-		return shim.Error(errorMessage)
+		return shim.Error(errorJson)
 	}
 
 	//logger.Debugf("End getShipmentHistory for shipment ID %s: %s", id, buffer.String())
