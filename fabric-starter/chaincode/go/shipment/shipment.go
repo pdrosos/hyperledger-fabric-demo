@@ -6,13 +6,13 @@ import (
 
 type Shipment struct {
 	TrackingCode        string    `json:"trackingCode"`
-	Courier             Courier   `json:"courier"`
+	Courier             string    `json:"courier"`
 	Sender              Sender    `json:"sender"`
 	Recipient           Recipient `json:"recipient"`
 	WeightInGrams       int       `json:"weightInGrams"`
-	ShippingType        string    `json:"shippingType"`
-	Size                Size      `json:"size"`
+	Size
 	Content             string    `json:"content"`
+	ShippingType        string    `json:"shippingType"`
 	IsFragile           bool      `json:"isFragile"`
 	LastState           string    `json:"lastState"`
 	LastLocation        *Address  `json:"lastLocation"`
@@ -22,15 +22,15 @@ type Shipment struct {
 }
 
 type ShipmentRecord struct {
-	Key   string
-	Value string
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 type Shipments []ShipmentRecord
 
 func NewShipment(
 	trackingCode string,
-	courier Courier,
+	courier string,
 	sender Sender,
 	recipient Recipient,
 	weightInGrams int,

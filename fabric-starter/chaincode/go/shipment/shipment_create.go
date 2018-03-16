@@ -28,15 +28,7 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	}
 
 	trackingCode := args[0]
-
-	courier := Courier{}
-	err = json.Unmarshal([]byte(args[1]), &courier)
-	if err != nil {
-		errorJson := this.errorJson("Unable to unmarshal Courier data")
-		logger.Error(errorJson)
-
-		return shim.Error(errorJson)
-	}
+	courier := args[1]
 
 	sender := Sender{}
 	err = json.Unmarshal([]byte(args[2]), &sender)

@@ -8,7 +8,14 @@ import (
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/logger"
 )
 
-func rootHandler(responseWriter http.ResponseWriter, request *http.Request) {
+type RootHandler struct {
+}
+
+func NewRootHandler() *RootHandler {
+	return &RootHandler{}
+}
+
+func (this *RootHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		logger.Log.Error("Unable to get hostname")
@@ -24,7 +31,7 @@ func rootHandler(responseWriter http.ResponseWriter, request *http.Request) {
 		logger.Revision,
 	}
 
-	responseWriter.Header().Set("Content-Type", "application/json")
+	rw.Header().Set("Content-Type", "application/json")
 	response, cerr := json.Marshal(view)
 	if cerr != nil {
 		logger.Log.Error("Unable to encode json")
@@ -32,5 +39,5 @@ func rootHandler(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	responseWriter.Write(response)
+	rw.Write(response)
 }

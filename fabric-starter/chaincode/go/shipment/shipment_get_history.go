@@ -11,10 +11,10 @@ import (
 )
 
 type ShipmentHistoryRecord struct {
-	TxId      string
-	Value     string
-	Timestamp string
-	IsDelete  bool
+	TxId      string `json:"txId"`
+	Value     string `json:"value"`
+	Timestamp string `json:"timestamp"`
+	IsDelete  bool   `json:"isDelete"`
 }
 
 type ShipmentHistory []ShipmentHistoryRecord
