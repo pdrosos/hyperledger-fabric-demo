@@ -42,7 +42,7 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 
 	defer resultsIterator.Close()
 
-	var history ShipmentHistory = make([]ShipmentHistoryItem, 0)
+	var history ShipmentHistory
 
 	// buffer is a JSON array containing historic values for the shipment
 	//var buffer bytes.Buffer
@@ -104,6 +104,13 @@ func (this *ShipmentChaincode) getShipmentHistory(stub shim.ChaincodeStubInterfa
 	}
 
 	//buffer.WriteString("]")
+
+	if history == nil {
+		errorJson := this.errorJson(fmt.Sprintf("Shipment ID %s does not exist", id))
+		logger.Error(errorJson)
+
+		return pb.Response{Status: 404, Message: errorJson}
+	}
 
 	historyBytes, err := json.Marshal(history)
 	if err != nil {
