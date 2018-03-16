@@ -49,7 +49,7 @@ func (this *ShipmentChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Respo
 	function, args := stub.GetFunctionAndParameters()
 	if function == "createShipment" {
 		return this.createShipment(stub, args)
-	} else if function == "updateShipment" {
+	} else if function == "updateShipment" { // todo
 		return this.updateShipment(stub, args)
 	} else if function == "changeShipmentStateAndLocation" {
 		return this.changeShipmentStateAndLocation(stub, args)

@@ -8,7 +8,7 @@ import (
 func (this *ShipmentChaincode) updateShipment(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	logger.Debug("Start updateShipment")
 
-	// todo
+	// todo: must be update of different parts of the shipment, in different methods
 	logger.Debug("TODO")
 
 	logger.Debug("End updateShipment")

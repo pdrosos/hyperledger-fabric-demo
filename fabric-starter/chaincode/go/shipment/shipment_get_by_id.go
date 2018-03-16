@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
@@ -19,13 +22,19 @@ func (this *ShipmentChaincode) getShipmentById(stub shim.ChaincodeStubInterface,
 
 	shipmentAsBytes, err := stub.GetState(id)
 	if err != nil {
-		jsonResp := "{\"Error\":\"Failed to get state for shipment " + id + "\"}"
+		stateError := &Error{
+			Error: fmt.Sprintf("Failed to get state for shipment ID %s", id),
+		}
+		jsonResponse, _ := json.Marshal(stateError)
 
-		return shim.Error(jsonResp)
+		return shim.Error(string(jsonResponse))
 	} else if shipmentAsBytes == nil {
-		jsonResp := "{\"Error\":\"Shipment does not exist: " + id + "\"}"
+		notFoundError := &Error{
+			Error: fmt.Sprintf("Shipment ID %s does not exist", id),
+		}
+		jsonResponse, _ := json.Marshal(notFoundError)
 
-		return shim.Error(jsonResp)
+		return pb.Response{Status: 404, Message: string(jsonResponse)}
 	}
 
 	logger.Debugf("End getShipmentById for shipment ID %s: %s", id, string(shipmentAsBytes))
