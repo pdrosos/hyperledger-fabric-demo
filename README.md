@@ -9,22 +9,24 @@ Seller needs to keep a separate private ledger of shipments for each of their co
 
 The projects consists of the following components:
  
-[Hyperledger Fabric network](fabric-starter/README.md) between the seller and one courier company.
+[Hyperledger Fabric 1.1.0 network](fabric-starter/README.md) between the seller and one courier company (courier1).
  
 [Chaincode](fabric-starter/chaincode/go/shipment) installed in the seller-courier1 channel.
 
-[Seller api and web app](seller/api/README.md) <br>
+[Seller Golang API](seller/api/README.md) and Angular web app<br>
 Only seller can create a shipment and decide to which of their courier partners to pass it for delivery.
 
-[Courier api and web app](courier/api/README.md) <br>
+[Courier Golang API](courier/api/README.md) and Angular web app<br>
 Only courier can change the shipment state and current location, once they receive it from the seller.
 
-[Customer api and web app](customer/api/README.md) <br>
+[Customer Golang API](customer/api/README.md) and Angular web app<br>
 Seller's customer know their own tracking codes and should have a way to track current shipment location and history in real time.
+
+[Hyperledger Fabric SDK Go](https://github.com/hyperledger/fabric-sdk-go) is used for communication between the blockchain and the Golang APIs.
 
 ## Acknowledgements
 
 The Hyperledger Fabric network uses a very helpful [fabric-starter](https://github.com/olegabu/fabric-starter) script, which integrates [fabric-rest](https://github.com/Altoros/fabric-rest) REST API server and admin web app.
 
-The scripts are inspired by [first-network](https://github.com/hyperledger/fabric-samples/tree/release/first-network) and 
- [balance-transfer](https://github.com/hyperledger/fabric-samples/tree/release/balance-transfer) of Hyperledger Fabric samples.
+The scripts are inspired by [first-network](https://github.com/hyperledger/fabric-samples/tree/release-1.1/first-network) and 
+ [balance-transfer](https://github.com/hyperledger/fabric-samples/tree/release-1.1/balance-transfer) of Hyperledger Fabric samples.
