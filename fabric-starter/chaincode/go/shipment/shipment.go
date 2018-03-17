@@ -39,9 +39,9 @@ func NewShipment(
 	content string,
 	isFragile bool,
 	lastState string,
+	createdAt time.Time,
+	updatedAt time.Time,
 ) *Shipment {
-	createdAt := time.Now().UTC()
-
 	shipment := &Shipment{
 		TrackingCode:        trackingCode,
 		Courier:             courier,
@@ -55,7 +55,7 @@ func NewShipment(
 		LastState:           lastState,
 		IsInCourierFacility: false,
 		CreatedAt:           createdAt,
-		UpdatedAt:           createdAt,
+		UpdatedAt:           updatedAt,
 	}
 
 	return shipment

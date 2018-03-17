@@ -17,8 +17,8 @@ type Shipment struct {
 	LastState           string    `json:"lastState"`
 	LastLocation        *Address  `json:"lastLocation"`
 	IsInCourierFacility bool      `json:"isInCourierFacility"`
-	CreatedAt           time.Time `json:"createdAt"`
-	UpdatedAt           time.Time `json:"updatedAt"`
+	CreatedAt           *time.Time `json:"createdAt"`
+	UpdatedAt           *time.Time `json:"updatedAt"`
 }
 
 type ShipmentRecord struct {

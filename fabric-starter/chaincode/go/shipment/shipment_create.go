@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
@@ -22,7 +23,7 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 	}
 
 	// validate arguments
-	err = this.validateArgumentsNotEmpty(10, args)
+	err = this.validateArgumentsNotEmpty(12, args)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -79,6 +80,22 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 
 	lastState := args[9]
 
+	createdAt, err := time.Parse(time.RFC3339Nano, args[10])
+	if err != nil {
+		errorJson := this.errorJson("11th argument createdAt must be time.RFC3339Nano formatted string")
+		logger.Error(errorJson)
+
+		return shim.Error(errorJson)
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339Nano, args[11])
+	if err != nil {
+		errorJson := this.errorJson("12th argument updatedAt must be time.RFC3339Nano formatted string")
+		logger.Error(errorJson)
+
+		return shim.Error(errorJson)
+	}
+
 	// check if shipment already exists
 	shipmentAsBytes, err := stub.GetState(trackingCode)
 	if err != nil {
@@ -105,6 +122,8 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 		content,
 		isFragile,
 		lastState,
+		createdAt,
+		updatedAt,
 	)
 
 	shipmentJSONAsBytes, err := json.Marshal(shipment)

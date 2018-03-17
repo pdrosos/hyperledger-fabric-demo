@@ -20,7 +20,7 @@ func (this *ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincod
 	}
 
 	// validate arguments
-	err = this.validateArgumentsNotEmpty(3, args)
+	err = this.validateArgumentsNotEmpty(4, args)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -65,8 +65,16 @@ func (this *ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincod
 		return shim.Error(errorJson)
 	}
 
+	updatedAt, err := time.Parse(time.RFC3339Nano, args[3])
+	if err != nil {
+		errorJson := this.errorJson("4th argument updatedAt must be time.RFC3339Nano formatted string")
+		logger.Error(errorJson)
+
+		return shim.Error(errorJson)
+	}
+
 	shipment.LastLocation = &lastLocation
-	shipment.UpdatedAt = time.Now().UTC()
+	shipment.UpdatedAt = updatedAt
 
 	// marshal shipment
 	shipmentJSONAsBytes, err := json.Marshal(shipment)

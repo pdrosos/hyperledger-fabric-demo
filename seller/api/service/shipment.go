@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/sirupsen/logrus"
@@ -31,6 +32,8 @@ func (this *ShipmentService) Create(shipment *model.Shipment) error {
 	recipient, _ := json.Marshal(shipment.Recipient)
 	size, _ := json.Marshal(shipment.Size)
 	lastState := "New"
+	createdAt := time.Now().UTC().Format(time.RFC3339Nano)
+	updatedAt := createdAt
 
 	args := [][]byte{
 		[]byte(shipment.TrackingCode),
@@ -43,6 +46,8 @@ func (this *ShipmentService) Create(shipment *model.Shipment) error {
 		[]byte(shipment.Content),
 		[]byte(strconv.FormatBool(shipment.IsFragile)),
 		[]byte(lastState),
+		[]byte(createdAt),
+		[]byte(updatedAt),
 	}
 
 	response, err := this.channelClient.Execute(
