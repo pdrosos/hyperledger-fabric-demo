@@ -11,12 +11,12 @@ type Shipment struct {
 	Recipient     Recipient `json:"recipient"`
 	WeightInGrams int       `json:"weightInGrams"`
 	Size
-	Content             string    `json:"content"`
-	ShippingType        string    `json:"shippingType"`
-	IsFragile           bool      `json:"isFragile"`
-	LastState           string    `json:"lastState"`
-	LastLocation        *Address  `json:"lastLocation"`
-	IsInCourierFacility bool      `json:"isInCourierFacility"`
+	Content             string     `json:"content"`
+	ShippingType        string     `json:"shippingType"`
+	IsFragile           bool       `json:"isFragile"`
+	LastState           string     `json:"lastState"`
+	LastLocation        *Address   `json:"lastLocation"`
+	IsInCourierFacility bool       `json:"isInCourierFacility"`
 	CreatedAt           *time.Time `json:"createdAt"`
 	UpdatedAt           *time.Time `json:"updatedAt"`
 }
@@ -27,36 +27,3 @@ type ShipmentRecord struct {
 }
 
 type Shipments []ShipmentRecord
-
-func NewShipment(
-	trackingCode string,
-	courier string,
-	sender Sender,
-	recipient Recipient,
-	weightInGrams int,
-	shippingType string,
-	size Size,
-	content string,
-	isFragile bool,
-	lastState string,
-) *Shipment {
-	createdAt := time.Now().UTC()
-
-	shipment := &Shipment{
-		TrackingCode:        trackingCode,
-		Courier:             courier,
-		Sender:              sender,
-		Recipient:           recipient,
-		WeightInGrams:       weightInGrams,
-		ShippingType:        shippingType,
-		Size:                size,
-		Content:             content,
-		IsFragile:           isFragile,
-		LastState:           lastState,
-		IsInCourierFacility: false,
-		CreatedAt:           createdAt,
-		UpdatedAt:           createdAt,
-	}
-
-	return shipment
-}
