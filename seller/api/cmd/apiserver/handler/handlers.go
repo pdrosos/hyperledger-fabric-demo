@@ -6,14 +6,16 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/rs/cors"
+	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
 
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/service"
 )
 
 func Register(channelClient *channel.Client) {
+	webClientUrl := viper.GetString("app.webClient.url")
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:4200"},
+		AllowedOrigins: []string{webClientUrl},
 	})
 
 	router := mux.NewRouter()

@@ -13,11 +13,11 @@ The projects consists of the following components:
  
 [Chaincode](fabric-starter/chaincode/go/shipment) installed in the seller-courier1 channel.
 
-[Seller Golang API](seller/api/README.md) and Angular web app<br>
+[Seller Golang API](seller/api/README.md) and [Angular web app](seller/web/README.md)<br>
 Only seller can create a shipment and decide to which of their courier partners to pass it for delivery.<br>
 Seller's customers know their own tracking codes and should have a way to track current shipment location and history in real time.
 
-[Courier Golang API](courier/api/README.md) and Angular web app<br>
+[Courier Golang API](courier/api/README.md) and [Angular web app](courier/web/README.md)<br>
 Only courier can change the shipment state and current location, once they receive it from the seller.
 
 [Hyperledger Fabric SDK Go](https://github.com/hyperledger/fabric-sdk-go) is used for communication between the blockchain and the Golang APIs.

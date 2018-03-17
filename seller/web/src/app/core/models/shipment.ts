@@ -1,6 +1,7 @@
 export interface Shipment {
   trackingCode: string;
   courier: string;
+  shippingType: string;
   sender: {
     firstName: string;
     lastName: string;
@@ -24,7 +25,6 @@ export interface Shipment {
   widthInMM: number;
   depthInMM: number;
   content: string;
-  shippingType: string;
   isFragile: boolean;
   lastState: string;
   lastLocation?: {

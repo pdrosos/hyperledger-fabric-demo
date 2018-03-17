@@ -1,4 +1,475 @@
 <div class="container">
   <h3 class="text-center">Create new shipment</h3>
 
+  <form (ngSubmit)="onCreateShipmentSubmit()" #createShipmentForm="ngForm" novalidate>
+    <fieldset>
+      <legend>
+        Shipment
+      </legend>
+
+      <div class="form-group row">
+        <label for="trackingCode" class="col-form-label col-md-3">Tracking code</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="trackingCode"
+                 name="trackingCode"
+                 required
+                 pattern="^[A-Za-z0-9]+$"
+                 [(ngModel)]="shipment.trackingCode"
+                 #trackingCodeControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="trackingCodeControl.invalid && (trackingCodeControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="trackingCodeControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+          <div *ngIf="trackingCodeControl.errors?.pattern" class="invalid-feedback">
+            Only alphanumeric characters are allowed
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="courier" class="col-form-label col-md-3">Courier</label>
+        <div class="col-md-6">
+          <select id="courier"
+                  name="courier"
+                  required
+                  [(ngModel)]="shipment.courier"
+                  #courierControl="ngModel"
+                  class="custom-select"
+                  [class.is-invalid]="courierControl.invalid && (courierControl.touched || createShipmentForm.submitted)">
+            <option value="courier1">Courier 1</option>
+            <!-- <option value="courier2">Courier 2</option> -->
+          </select>
+
+          <div *ngIf="courierControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="shippingType" class="col-form-label col-md-3">Shipping type</label>
+        <div class="col-md-6">
+          <select id="shippingType"
+                  name="shippingType"
+                  required
+                  [(ngModel)]="shipment.shippingType"
+                  #shippingTypeControl="ngModel"
+                  class="custom-select"
+                  [class.is-invalid]="shippingTypeControl.invalid && (shippingTypeControl.touched || createShipmentForm.submitted)">
+            <option value="Express">Express</option>
+            <option value="Regular">Regular</option>
+          </select>
+
+          <div *ngIf="shippingTypeControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Parcel</legend>
+
+      <div class="form-group row">
+        <label for="weightInGrams" class="col-form-label col-md-3">Weight (g)</label>
+        <div class="col-md-6">
+          <input type="number"
+                 id="weightInGrams"
+                 name="weightInGrams"
+                 [(ngModel)]="shipment.weightInGrams"
+                 #weightInGramsControl="ngModel"
+                 required
+                 pattern="^[0-9]+$"
+                 class="form-control"
+                 [class.is-invalid]="weightInGramsControl.invalid && (weightInGramsControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="weightInGramsControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+          <div *ngIf="weightInGramsControl.errors?.pattern" class="invalid-feedback">
+            Only numbers are allowed
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="weightInGrams" class="col-form-label col-md-3">Dimensions (H x W x D)</label>
+        <div class="form-row col-md-6">
+          <div class="col">
+            <input type="number"
+                   id="heightInMM"
+                   name="heightInMM"
+                   placeholder="Height (mm)"
+                   [(ngModel)]="shipment.heightInMM"
+                   #heightInMMControl="ngModel"
+                   required
+                   pattern="^[0-9]+$"
+                   class="form-control"
+                   [class.is-invalid]="heightInMMControl.invalid && (heightInMMControl.touched || createShipmentForm.submitted)">
+
+            <div *ngIf="heightInMMControl.errors?.required" class="invalid-feedback">
+              Value is required
+            </div>
+            <div *ngIf="heightInMMControl.errors?.pattern" class="invalid-feedback">
+              Only numbers are allowed
+            </div>
+          </div>
+
+          <div class="col">
+            <input type="number"
+                   id="widthInMM"
+                   name="widthInMM"
+                   placeholder="Width (mm)"
+                   [(ngModel)]="shipment.widthInMM"
+                   #widthInMMControl="ngModel"
+                   required
+                   pattern="^[0-9]+$"
+                   class="form-control"
+                   [class.is-invalid]="widthInMMControl.invalid && (widthInMMControl.touched || createShipmentForm.submitted)">
+
+            <div *ngIf="widthInMMControl.errors?.required" class="invalid-feedback">
+              Value is required
+            </div>
+            <div *ngIf="widthInMMControl.errors?.pattern" class="invalid-feedback">
+              Only numbers are allowed
+            </div>
+          </div>
+
+          <div class="col">
+            <input type="number"
+                   id="depthInMM"
+                   name="depthInMM"
+                   placeholder="Depth (mm)"
+                   [(ngModel)]="shipment.depthInMM"
+                   #depthInMMControl="ngModel"
+                   required
+                   pattern="^[0-9]+$"
+                   class="form-control"
+                   [class.is-invalid]="depthInMMControl.invalid && (depthInMMControl.touched || createShipmentForm.submitted)">
+
+            <div *ngIf="depthInMMControl.errors?.required" class="invalid-feedback">
+              Value is required
+            </div>
+            <div *ngIf="depthInMMControl.errors?.pattern" class="invalid-feedback">
+              Only numbers are allowed
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="content" class="col-form-label col-md-3">Content</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="content"
+                 name="content"
+                 required
+                 [(ngModel)]="shipment.content"
+                 #contentControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="contentControl.invalid && (contentControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="contentControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-md-6 offset-md-3">
+          <div class="form-check">
+            <input type="checkbox"
+                   id="isFragile"
+                   name="isFragile"
+                   [(ngModel)]="shipment.isFragile"
+                   #isFragileControl="ngModel"
+                   class="custom-control-input">
+            <label for="isFragile" class="custom-control-label">Fragile</label>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Sender</legend>
+
+      <div class="form-group row">
+        <label for="senderFirstName" class="col-form-label col-md-3">First name</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="senderFirstName"
+                 name="senderFirstName"
+                 required
+                 [(ngModel)]="shipment.sender.firstName"
+                 #senderFirstNameControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="senderFirstNameControl.invalid && (senderFirstNameControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="senderFirstNameControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="senderLastName" class="col-form-label col-md-3">Last name</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="senderLastName"
+                 name="senderLastName"
+                 required
+                 [(ngModel)]="shipment.sender.lastName"
+                 #senderLastNameControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="senderLastNameControl.invalid && (senderLastNameControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="senderLastNameControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="senderPhone" class="col-form-label col-md-3">Phone</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="senderPhone"
+                 name="senderPhone"
+                 required
+                 pattern="^[0-9]+$"
+                 [(ngModel)]="shipment.sender.phone"
+                 #senderPhoneControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="senderPhoneControl.invalid && (senderPhoneControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="senderPhoneControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+          <div *ngIf="senderPhoneControl.errors?.pattern" class="invalid-feedback">
+            Only numbers are allowed
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="senderCountry" class="col-form-label col-md-3">Country</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="senderCountry"
+                 name="senderCountry"
+                 required
+                 [(ngModel)]="shipment.sender.country"
+                 #senderCountryControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="senderCountryControl.invalid && (senderCountryControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="senderCountryControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="senderCity" class="col-form-label col-md-3">City</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="senderCity"
+                 name="senderCity"
+                 required
+                 [(ngModel)]="shipment.sender.city"
+                 #senderCityControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="senderCityControl.invalid && (senderCityControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="senderCityControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="senderPostCode" class="col-form-label col-md-3">Post code</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="senderPostCode"
+                 name="senderPostCode"
+                 required
+                 [(ngModel)]="shipment.sender.postCode"
+                 #senderPostCodeControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="senderPostCodeControl.invalid && (senderPostCodeControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="senderPostCodeControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="senderAddress" class="col-form-label col-md-3">Address</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="senderAddress"
+                 name="senderAddress"
+                 required
+                 [(ngModel)]="shipment.sender.address"
+                 #senderAddressControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="senderAddressControl.invalid && (senderAddressControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="senderAddressControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Recipient</legend>
+
+      <div class="form-group row">
+        <label for="recipientFirstName" class="col-form-label col-md-3">First name</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="recipientFirstName"
+                 name="recipientFirstName"
+                 required
+                 [(ngModel)]="shipment.recipient.firstName"
+                 #recipientFirstNameControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="recipientFirstNameControl.invalid && (recipientFirstNameControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="recipientFirstNameControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="recipientLastName" class="col-form-label col-md-3">Last name</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="recipientLastName"
+                 name="recipientLastName"
+                 required
+                 [(ngModel)]="shipment.recipient.lastName"
+                 #recipientLastNameControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="recipientLastNameControl.invalid && (recipientLastNameControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="recipientLastNameControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="recipientPhone" class="col-form-label col-md-3">Phone</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="recipientPhone"
+                 name="recipientPhone"
+                 required
+                 pattern="^[0-9]+$"
+                 [(ngModel)]="shipment.recipient.phone"
+                 #recipientPhoneControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="recipientPhoneControl.invalid && (recipientPhoneControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="recipientPhoneControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+          <div *ngIf="recipientPhoneControl.errors?.pattern" class="invalid-feedback">
+            Only numbers are allowed
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="recipientCountry" class="col-form-label col-md-3">Country</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="recipientCountry"
+                 name="recipientCountry"
+                 required
+                 [(ngModel)]="shipment.recipient.country"
+                 #recipientCountryControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="recipientCountryControl.invalid && (recipientCountryControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="recipientCountryControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="recipientCity" class="col-form-label col-md-3">City</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="recipientCity"
+                 name="recipientCity"
+                 required
+                 [(ngModel)]="shipment.recipient.city"
+                 #recipientCityControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="recipientCityControl.invalid && (recipientCityControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="recipientCityControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="recipientPostCode" class="col-form-label col-md-3">Post code</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="recipientPostCode"
+                 name="recipientPostCode"
+                 required
+                 [(ngModel)]="shipment.recipient.postCode"
+                 #recipientPostCodeControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="recipientPostCodeControl.invalid && (recipientPostCodeControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="recipientPostCodeControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="recipientAddress" class="col-form-label col-md-3">Address</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="recipientAddress"
+                 name="recipientAddress"
+                 required
+                 [(ngModel)]="shipment.recipient.address"
+                 #recipientAddressControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="recipientAddressControl.invalid && (recipientAddressControl.touched || createShipmentForm.submitted)">
+
+          <div *ngIf="recipientAddressControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="row">
+      <div class="col-lg-3 mb-3">
+        <button type="submit" class="btn btn-success" [disabled]="submitDisabled">
+          Create Shipment
+        </button>
+      </div>
+      <div class="col-lg-9 mb-3">
+        <button type="button" class="btn btn-outline-secondary" routerLink="/">Cancel</button>
+      </div>
+    </div>
+  </form>
 </div>

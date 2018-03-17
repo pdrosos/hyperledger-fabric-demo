@@ -5,3 +5,5 @@ app:
     username: User1
     channelID: seller-courier1
     chaincodeID: shipment
+  webClient:
+    url: http://localhost:6200
