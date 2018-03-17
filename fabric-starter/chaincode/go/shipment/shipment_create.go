@@ -87,7 +87,7 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 
 		return shim.Error(errorJson)
 	} else if shipmentAsBytes != nil {
-		errorJson := this.errorJson(fmt.Sprintf("Shipment %s already exists" + trackingCode))
+		errorJson := this.errorJson(fmt.Sprintf("Shipment %s already exists", trackingCode))
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)

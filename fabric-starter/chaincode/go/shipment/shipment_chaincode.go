@@ -96,7 +96,7 @@ func (this *ShipmentChaincode) getCreator(certificate []byte) (string, string) {
 
 func (this *ShipmentChaincode) validateArgumentsNotEmpty(argsCount int, args []string) error {
 	if len(args) != argsCount {
-		errorJson := this.errorJson(fmt.Sprintf("Incorrect number of arguments. Expecting %s", argsCount))
+		errorJson := this.errorJson(fmt.Sprintf("Incorrect number of arguments. Expecting %d", argsCount))
 		logger.Error(errorJson)
 
 		return errors.New(errorJson)
@@ -104,7 +104,7 @@ func (this *ShipmentChaincode) validateArgumentsNotEmpty(argsCount int, args []s
 
 	for index, element := range args {
 		if len(element) <= 0 {
-			errorJson := this.errorJson(fmt.Sprintf("Argument %s must be a non-empty string", index+1))
+			errorJson := this.errorJson(fmt.Sprintf("Argument %d must be a non-empty string", index+1))
 			logger.Error(errorJson)
 
 			return errors.New(errorJson)
