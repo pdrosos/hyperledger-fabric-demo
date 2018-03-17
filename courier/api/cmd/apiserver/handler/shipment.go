@@ -79,7 +79,7 @@ func (this *ShipmentHandler) updateStateAndLocation(rw http.ResponseWriter, r *h
 		return
 	}
 
-	rw.WriteHeader(http.StatusCreated)
+	rw.WriteHeader(http.StatusOK)
 	rw.Write(nil)
 }
 

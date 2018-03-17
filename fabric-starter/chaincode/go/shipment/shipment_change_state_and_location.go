@@ -54,6 +54,14 @@ func (this *ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincod
 		return shim.Error(errorJson)
 	}
 
+	// cannot change state of delivered shipment
+	if shipment.IsDelivered {
+		errorJson := this.errorJson(fmt.Sprintf("Can not change state of delivered shipment %s", trackingCode))
+		logger.Error(errorJson)
+
+		return shim.Error(errorJson)
+	}
+
 	lastState := args[1]
 
 	lastLocation := Address{}
