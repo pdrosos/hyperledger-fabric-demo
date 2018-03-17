@@ -21,9 +21,4 @@ type Shipment struct {
 	UpdatedAt           *time.Time `json:"updatedAt"`
 }
 
-type ShipmentRecord struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type Shipments []ShipmentRecord
+type Shipments []Shipment

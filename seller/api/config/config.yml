@@ -1,6 +1,7 @@
 app:
   fabric:
     organization: seller
+    courier1: courier1
     username: User1
     channelID: seller-courier1
     chaincodeID: shipment

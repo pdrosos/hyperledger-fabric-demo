@@ -79,7 +79,36 @@ func (this *ShipmentHandler) create(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (this *ShipmentHandler) getAll(rw http.ResponseWriter, r *http.Request) {
+	data, err := this.shipmentService.GetAll()
+	if err != nil {
+		response.ResponseError(
+			rw,
+			http.StatusInternalServerError,
+			"InternalServerError",
+			"Can not get shipments",
+			make([]viewmodel.ErrorDetails, 0),
+			err,
+		)
 
+		return
+	}
+
+	rw.Header().Set("Content-Type", "application/json")
+	jsonResponse, err := json.Marshal(data)
+	if err != nil {
+		response.ResponseError(
+			rw,
+			http.StatusInternalServerError,
+			"InternalServerError",
+			"Can not encode json",
+			make([]viewmodel.ErrorDetails, 0),
+			err,
+		)
+
+		return
+	}
+
+	rw.Write(jsonResponse)
 }
 
 func (this *ShipmentHandler) getByTrackingCode(rw http.ResponseWriter, r *http.Request) {

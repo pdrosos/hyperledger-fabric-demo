@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
+	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/inputmodel"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/logger"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/model"
 )
@@ -69,8 +70,51 @@ func (this *ShipmentService) Create(shipment *model.Shipment) error {
 	return nil
 }
 
-func (this *ShipmentService) GetAll() ([]*model.Shipment, error) {
-	return nil, nil
+func (this *ShipmentService) GetAll() ([]model.Shipment, error) {
+	args := [][]byte{}
+	response, err := this.channelClient.Query(
+		channel.Request{
+			ChaincodeID: this.chaincodeID,
+			Fcn:         "getAllShipments",
+			Args:        args,
+		},
+	)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"response": string(response.Payload),
+		}).WithError(err).Error("Unable to get all shipments")
+
+		return nil, err
+	}
+
+	records := make(inputmodel.Shipments, 0)
+	err = json.Unmarshal(response.Payload, &records)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"payload": string(response.Payload),
+		}).WithError(err).Error("Unable to unmarshal all shipments payload")
+
+		return nil, err
+	}
+
+	shipments := make([]model.Shipment, 0, len(records))
+
+	for key, value := range records {
+		shipment := model.Shipment{}
+		err := json.Unmarshal([]byte(value.Value), &shipment)
+		if err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"key":   key,
+				"value": value,
+			}).WithError(err).Error("Unable to unmarshal shipment from value")
+
+			return nil, err
+		}
+
+		shipments = append(shipments, shipment)
+	}
+
+	return shipments, nil
 }
 
 func (this *ShipmentService) GetByTrackingCode(trackingCode string) (*model.Shipment, error) {
