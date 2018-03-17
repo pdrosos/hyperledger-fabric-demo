@@ -5,11 +5,17 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/rs/cors"
+	"github.com/urfave/negroni"
 
 	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/service"
 )
 
 func Register(channelClient *channel.Client) {
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:5200"},
+	})
+
 	router := mux.NewRouter()
 
 	shipmentService := service.NewShipmentService(channelClient)
@@ -26,5 +32,14 @@ func Register(channelClient *channel.Client) {
 	// default route
 	router.Handle("/", NewRootHandler()).Methods("GET", "HEAD")
 
-	http.Handle("/", router)
+	// middleware used for all routes
+	n := negroni.New(
+		negroni.NewRecovery(),
+		negroni.NewLogger(),
+		c,
+	)
+	// router goes last
+	n.UseHandler(router)
+
+	http.Handle("/", n)
 }

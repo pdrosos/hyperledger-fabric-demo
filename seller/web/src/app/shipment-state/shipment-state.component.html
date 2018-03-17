@@ -1,0 +1,90 @@
+<div class="container" *ngIf="shipment">
+  <h2 class="text-center">
+    {{ shipment.courier }} Shipment Current State ({{ trackingCode }})
+  </h2>
+
+  <div class="row">
+    <div class="card" class="col-md-4">
+      <div class="card-header">
+        Shipment
+        <span *ngIf="shipment.isDelivered">(delivered)</span>
+      </div>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <strong>Type:</strong>
+          {{ shipment.shippingType }}
+        </li>
+        <li class="list-group-item">
+          <strong>Size:</strong>
+          {{ shipment.heightInMM }} x {{ shipment.widthInMM }} x {{ shipment.depthInMM }} mm, {{ shipment.weightInGrams }} g
+        </li>
+        <li class="list-group-item">
+          <strong>Content:</strong>
+          {{ shipment.content }}
+          <span *ngIf="shipment.isFragile">(Fragile)</span>
+        </li>
+        <li class="list-group-item">
+          <strong>State:</strong>
+          {{ shipment.lastState }}
+        </li>
+        <li class="list-group-item">
+          <strong>Location:</strong>
+          <span *ngIf="shipment.lastLocation">
+            {{ shipment.lastLocation.country }}, {{ shipment.lastLocation.city }} {{ shipment.lastLocation.postCode }},
+            {{ shipment.lastLocation.address }}
+          </span>
+          <span *ngIf="!shipment.lastLocation">With seller</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Updated at:</strong>
+          {{ shipment.updatedAt | date:'short':'':'uk' }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="card" class="col-md-4">
+      <div class="card-header">
+        Sender
+      </div>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <strong>Name:</strong>
+          {{ shipment.sender.firstName }} {{ shipment.sender.lastName }}
+        </li>
+        <li class="list-group-item">
+          <strong>Address:</strong>
+          {{ shipment.sender.country }}, {{ shipment.sender.city }} {{ shipment.sender.postCode }},
+          {{ shipment.sender.address }}
+        </li>
+        <li class="list-group-item">
+          <strong>Phone:</strong>
+         {{ shipment.sender.phone }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="card" class="col-md-4">
+      <div class="card-header">
+        Recipient
+      </div>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <strong>Name:</strong>
+          {{ shipment.recipient.firstName }} {{ shipment.recipient.lastName }}
+        </li>
+        <li class="list-group-item">
+          <strong>Address:</strong>
+          {{ shipment.recipient.country }}, {{ shipment.recipient.city }} {{ shipment.recipient.postCode }},
+          {{ shipment.recipient.address }}
+        </li>
+        <li class="list-group-item">
+          <strong>Phone:</strong>
+          {{ shipment.recipient.phone }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

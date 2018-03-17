@@ -1,0 +1,111 @@
+<div class="container" *ngIf="(shipmentHistory$ | async) && shipment">
+  <h2 class="text-center">
+    Tracking {{ shipment.courier }} Shipment ({{ trackingCode }})
+  </h2>
+
+  <div class="row">
+    <div class="card" class="col-md-4">
+      <div class="card-header">
+        Sender
+      </div>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <strong>Name:</strong>
+        {{ shipment.sender.firstName }} {{ shipment.sender.lastName }}
+        </li>
+        <li class="list-group-item">
+          <strong>Address:</strong>
+        {{ shipment.sender.country }}, {{ shipment.sender.city }} {{ shipment.sender.postCode }},
+        {{ shipment.sender.address }}
+        </li>
+        <li class="list-group-item">
+          <strong>Phone:</strong>
+        {{ shipment.sender.phone }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="card" class="col-md-4">
+      <div class="card-header">
+        Recipient
+      </div>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <strong>Name:</strong>
+        {{ shipment.recipient.firstName }} {{ shipment.recipient.lastName }}
+        </li>
+        <li class="list-group-item">
+          <strong>Address:</strong>
+        {{ shipment.recipient.country }}, {{ shipment.recipient.city }} {{ shipment.recipient.postCode }},
+        {{ shipment.recipient.address }}
+        </li>
+        <li class="list-group-item">
+          <strong>Phone:</strong>
+        {{ shipment.recipient.phone }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="card" class="col-md-4">
+      <div class="card-header">
+        Shipment
+        <span *ngIf="shipment.isDelivered">(delivered)</span>
+      </div>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <strong>Type:</strong>
+          {{ shipment.shippingType }}
+        </li>
+        <li class="list-group-item">
+          <strong>Size:</strong>
+          {{ shipment.heightInMM }} x {{ shipment.widthInMM }} x {{ shipment.depthInMM }} mm, {{ shipment.weightInGrams }} g
+        </li>
+        <li class="list-group-item">
+          <strong>Content:</strong>
+          {{ shipment.content }}
+          <span *ngIf="shipment.isFragile">(Fragile)</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="text-center">Details</h3>
+
+  <div class="table-responsive-md">
+    <table class="table table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">
+            State
+          </th>
+          <th scope="col">
+            Location
+          </th>
+          <th scope="col">
+            Time
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let shipment of shipmentHistory$ | async">
+          <td>
+            {{ shipment.lastState }}
+          </td>
+          <td>
+            <div *ngIf="shipment.lastLocation">
+              {{ shipment.lastLocation.country }}, {{ shipment.lastLocation.city }} {{ shipment.lastLocation.postCode }},
+              {{ shipment.lastLocation.address }}
+            </div>
+            <span *ngIf="!shipment.lastLocation">With seller</span>
+          </td>
+          <td>
+            {{ shipment.updatedAt | date:'short':'':'uk' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

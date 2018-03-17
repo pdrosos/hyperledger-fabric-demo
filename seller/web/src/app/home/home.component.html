@@ -1,0 +1,64 @@
+<div class="container">
+  <h2 class="text-center">
+    Last shipments
+  </h2>
+
+  <div class="table-responsive-md">
+    <table class="table table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">
+            Tracking Code
+          </th>
+          <th scope="col">
+            From
+          </th>
+          <th scope="col">
+            Address
+          </th>
+          <th scope="col">
+            To
+          </th>
+          <th scope="col">
+            Address
+          </th>
+          <th scope="col">
+            Current state
+          </th>
+          <th scope="col">
+            Time
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let shipment of shipments$ | async">
+          <th scope="row">
+            <a [routerLink]="['/shipments', shipment.trackingCode, 'history']">
+              {{ shipment.trackingCode }}
+            </a>
+          </th>
+          <td>
+            {{ shipment.sender.firstName }} {{ shipment.sender.lastName }}
+          </td>
+          <td>
+            {{ shipment.sender.country }}, {{ shipment.sender.city }} {{ shipment.sender.postCode }}
+          </td>
+          <td>
+            {{ shipment.recipient.firstName }} {{ shipment.recipient.lastName }}
+          </td>
+          <td>
+            {{ shipment.recipient.country }}, {{ shipment.recipient.city }} {{ shipment.recipient.postCode }}
+          </td>
+          <td>
+            <a [routerLink]="['/shipments', shipment.trackingCode]">
+              {{ shipment.lastState }}
+            </a>
+          </td>
+          <td>
+            {{ shipment.updatedAt | date:'short':'':'uk' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
