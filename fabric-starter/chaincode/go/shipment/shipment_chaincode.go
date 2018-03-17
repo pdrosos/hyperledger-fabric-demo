@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"strings"
 
+	"encoding/json"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
-	"encoding/json"
 )
 
 var logger = shim.NewLogger("ShipmentChaincode")

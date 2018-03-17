@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
+	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/fabricsdk"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/inputmodel"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/logger"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/model"
@@ -29,6 +30,13 @@ func NewShipmentService(channelClient *channel.Client) *ShipmentService {
 }
 
 func (this *ShipmentService) Create(shipment *model.Shipment) error {
+	organizationPeer0, courier1Peer0, err := fabricsdk.LoadPeers()
+	if err != nil {
+		logger.Log.WithError(err).Error("Failed to create organization and courier1 peers")
+
+		return err
+	}
+
 	sender, _ := json.Marshal(shipment.Sender)
 	recipient, _ := json.Marshal(shipment.Recipient)
 	size, _ := json.Marshal(shipment.Size)
@@ -57,6 +65,7 @@ func (this *ShipmentService) Create(shipment *model.Shipment) error {
 			Fcn:         "createShipment",
 			Args:        args,
 		},
+		channel.WithTargets(organizationPeer0, courier1Peer0), // transaction will be confirmed from both seller and courier1 peers
 	)
 	if err != nil {
 		logger.Log.WithFields(logrus.Fields{

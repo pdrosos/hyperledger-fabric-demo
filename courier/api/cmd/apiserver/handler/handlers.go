@@ -4,16 +4,27 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+
+	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/service"
 )
 
-func Register() {
+func Register(channelClient *channel.Client) {
 	router := mux.NewRouter()
 
-	// default route
-	router.HandleFunc("/", rootHandler).Methods("GET", "HEAD")
+	shipmentService := service.NewShipmentService(channelClient)
+	shipmentHandler := NewShipmentHandler(shipmentService)
 
-	// not found
-	//router.NotFoundHandler = http.HandlerFunc(notFoundHandler)
+	router.Handle("/shipments/{trackingCode}/state", shipmentHandler.UpdateStateAndLocation()).Methods("PATCH")
+
+	router.Handle("/shipments", shipmentHandler.GetAll()).Methods("GET")
+
+	router.Handle("/shipments/{trackingCode}", shipmentHandler.GetByTrackingCode()).Methods("GET")
+
+	router.Handle("/shipments/{trackingCode}/history", shipmentHandler.GetHistory()).Methods("GET")
+
+	// default route
+	router.Handle("/", NewRootHandler()).Methods("GET", "HEAD")
 
 	http.Handle("/", router)
 }

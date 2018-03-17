@@ -8,6 +8,15 @@ Start the docker containers: `docker-compose up -d`
 
 Application runs on http://localhost:7777
 
+## Endpoints
+
+POST /shipments - create a new shipment
+
+GET /shipments - get all shipments
+
+GET /shipments/{trackingCode} - get current shipment state by tracking code
+
+GET /shipments/{trackingCode}/history - get shipment history by tracking code
 
 ## For developers
 

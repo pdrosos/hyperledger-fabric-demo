@@ -8,6 +8,15 @@ Start the docker containers: `docker-compose up -d`
 
 Application runs on http://localhost:8888
 
+## Endpoints
+
+PATCH /shipments/{trackingCode}/state - update shipment state and location
+
+GET /shipments - get all shipments
+
+GET /shipments/{trackingCode} - get current shipment state by tracking code
+
+GET /shipments/{trackingCode}/history - get shipment history by tracking code
 
 ## For developers
 

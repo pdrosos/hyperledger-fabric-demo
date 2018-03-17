@@ -1,8 +1,11 @@
 package fabricsdk
 
 import (
+	"errors"
+
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/peer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
@@ -10,11 +13,16 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/logger"
 )
 
+var fabricSDK *fabsdk.FabricSDK
+
 func GetFabricSdk() (*fabsdk.FabricSDK, error) {
+	if fabricSDK != nil {
+		return fabricSDK, nil
+	}
+
 	// load config
 	configOpt := config.FromFile("./config/network_config.yaml")
 
@@ -25,10 +33,19 @@ func GetFabricSdk() (*fabsdk.FabricSDK, error) {
 		return nil, err
 	}
 
-	return sdk, nil
+	fabricSDK = sdk
+
+	return fabricSDK, nil
 }
 
-func GetChannelClient(fabricSDK *fabsdk.FabricSDK) (*channel.Client, error) {
+func GetChannelClient() (*channel.Client, error) {
+	if fabricSDK == nil {
+		err := errors.New("Fabric SDK is not created. Call GetFabricSdk() first")
+		logger.Log.WithError(err).Errorf("Unable to create Fabric Channel Client")
+
+		return nil, err
+	}
+
 	organization := viper.GetString("app.fabric.organization")
 	username := viper.GetString("app.fabric.username")
 	channelID := viper.GetString("app.fabric.channelID")
@@ -56,37 +73,50 @@ func GetChannelClient(fabricSDK *fabsdk.FabricSDK) (*channel.Client, error) {
 	return client, nil
 }
 
-func LoadOrgPeers(sdk *fabsdk.FabricSDK) (fab.Peer, fab.Peer, error) {
-	sellerName := viper.GetString("app.fabric.organization")
-	courier1Name := viper.GetString("app.fabric.organization")
-
-	sellerPeers, err := sdk.Config().PeersConfig(sellerName)
-	if err != nil {
-		logger.Log.WithError(err).Errorf("Unable to get seller peers config")
+func LoadPeers() (fab.Peer, fab.Peer, error) {
+	if fabricSDK == nil {
+		err := errors.New("Fabric SDK is not created. Call GetFabricSdk() first")
+		logger.Log.WithError(err).Errorf("Unable to get peers")
 
 		return nil, nil, err
 	}
 
-	courier1Peers, err := sdk.Config().PeersConfig(courier1Name)
+	organization := viper.GetString("app.fabric.organization")
+	courier1 := viper.GetString("app.fabric.courier1")
+
+	organizationPeersConfig, err := fabricSDK.Config().PeersConfig(organization)
+	if err != nil {
+		logger.Log.WithError(err).Errorf("Unable to get organization peers config")
+
+		return nil, nil, err
+	}
+
+	courier1PeersConfig, err := fabricSDK.Config().PeersConfig(courier1)
 	if err != nil {
 		logger.Log.WithError(err).Errorf("Unable to get courier1 peers config")
 
 		return nil, nil, err
 	}
 
-	sellerPeer0, err := peer.New(sdk.Config(), peer.FromPeerConfig(&core.NetworkPeer{PeerConfig: sellerPeers[0]}))
+	organizationPeer0, err := peer.New(
+		fabricSDK.Config(),
+		peer.FromPeerConfig(&core.NetworkPeer{PeerConfig: organizationPeersConfig[0]}),
+	)
 	if err != nil {
-		logger.Log.WithError(err).Errorf("Unable to create seller peer")
+		logger.Log.WithError(err).Errorf("Unable to create organization peer")
 
 		return nil, nil, err
 	}
 
-	courier1Peer0, err := peer.New(sdk.Config(), peer.FromPeerConfig(&core.NetworkPeer{PeerConfig: courier1Peers[0]}))
+	courier1Peer0, err := peer.New(
+		fabricSDK.Config(),
+		peer.FromPeerConfig(&core.NetworkPeer{PeerConfig: courier1PeersConfig[0]}),
+	)
 	if err != nil {
 		logger.Log.WithError(err).Errorf("Unable to create courier1 peer")
 
 		return nil, nil, err
 	}
 
-	return sellerPeer0, courier1Peer0, nil
+	return organizationPeer0, courier1Peer0, nil
 }

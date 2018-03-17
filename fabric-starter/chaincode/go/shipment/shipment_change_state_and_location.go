@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -20,7 +21,7 @@ func (this *ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincod
 	}
 
 	// validate arguments
-	err = this.validateArgumentsNotEmpty(4, args)
+	err = this.validateArgumentsNotEmpty(5, args)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -32,20 +33,20 @@ func (this *ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincod
 
 	shipmentAsBytes, err := stub.GetState(trackingCode)
 	if err != nil {
-		jsonResp := "{\"Error\":\"Failed to get state for shipment " + trackingCode + "\"}"
-		logger.Error(jsonResp)
+		errorJson := this.errorJson(fmt.Sprintf("Failed to get state for shipment %s", trackingCode))
+		logger.Error(errorJson)
 
-		return shim.Error(jsonResp)
+		return shim.Error(errorJson)
 	} else if shipmentAsBytes == nil {
-		jsonResp := "{\"Error\":\"Shipment does not exist: " + trackingCode + "\"}"
-		logger.Error(jsonResp)
+		errorJson := this.errorJson(fmt.Sprintf("Shipment %s does not exist", trackingCode))
+		logger.Error(errorJson)
 
-		return shim.Error(jsonResp)
+		return pb.Response{Status: 404, Message: errorJson}
 	}
 
 	// unmarshal and change shipment state, location and updated at date
 	shipment := Shipment{}
-	err = json.Unmarshal(shipmentAsBytes, shipment)
+	err = json.Unmarshal(shipmentAsBytes, &shipment)
 	if err != nil {
 		errorJson := this.errorJson(fmt.Sprintf("Unable to unmarshal shipment %s bytes", trackingCode))
 		logger.Error(errorJson)
@@ -54,26 +55,36 @@ func (this *ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincod
 	}
 
 	lastState := args[1]
-	shipment.LastState = lastState
 
 	lastLocation := Address{}
 	err = json.Unmarshal([]byte(args[2]), &lastLocation)
 	if err != nil {
-		errorJson := this.errorJson(fmt.Sprintf("Unable to unmarshal shipment %s LastLocation data", trackingCode))
+		errorJson := this.errorJson(fmt.Sprintf("Unable to unmarshal shipment %s location data", trackingCode))
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
 	}
 
-	updatedAt, err := time.Parse(time.RFC3339Nano, args[3])
+	isDelivered, err := strconv.ParseBool(args[3])
 	if err != nil {
-		errorJson := this.errorJson("4th argument updatedAt must be time.RFC3339Nano formatted string")
+		errorJson := this.errorJson("4th argument isDelivered must be a boolean representing string")
 		logger.Error(errorJson)
 
 		return shim.Error(errorJson)
 	}
 
+	updatedAt, err := time.Parse(time.RFC3339Nano, args[4])
+	if err != nil {
+		errorJson := this.errorJson("5th argument updatedAt must be time.RFC3339Nano formatted string")
+		logger.Error(errorJson)
+
+		return shim.Error(errorJson)
+	}
+
+	// change shipment state and location
+	shipment.LastState = lastState
 	shipment.LastLocation = &lastLocation
+	shipment.IsDelivered = isDelivered
 	shipment.UpdatedAt = updatedAt
 
 	// marshal shipment

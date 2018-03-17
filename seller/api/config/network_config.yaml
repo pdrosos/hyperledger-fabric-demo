@@ -172,7 +172,7 @@ channels:
 
     chaincodes:
       - reference:1.0
-      - relationship:1.0
+      - shipment:1.0
 
 #
 # list of participating organizations in this network

@@ -26,8 +26,5 @@ func Register(channelClient *channel.Client) {
 	// default route
 	router.Handle("/", NewRootHandler()).Methods("GET", "HEAD")
 
-	// not found
-	//router.NotFoundHandler = http.HandlerFunc(notFoundHandler)
-
 	http.Handle("/", router)
 }

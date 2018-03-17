@@ -107,7 +107,7 @@ func (this *ShipmentChaincode) createShipment(stub shim.ChaincodeStubInterface, 
 		errorJson := this.errorJson(fmt.Sprintf("Shipment %s already exists", trackingCode))
 		logger.Error(errorJson)
 
-		return shim.Error(errorJson)
+		return pb.Response{Status: 409, Message: errorJson}
 	}
 
 	// create new shipment and marshal it to JSON

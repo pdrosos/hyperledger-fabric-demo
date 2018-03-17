@@ -8,7 +8,7 @@ version='0.0.1'
 
 name='github.com/pdrosos/hyperledger-fabric-demo/seller/api'
 package=$workspace/src/$name
-goversion='go1.10'exit
+goversion='go1.10'
 constraint='.'
 ldflags="-X ${name}.Version=${version}"
 

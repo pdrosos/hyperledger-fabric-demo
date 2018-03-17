@@ -5,20 +5,20 @@ import (
 )
 
 type Shipment struct {
-	TrackingCode        string    `json:"trackingCode"`
-	Courier             string    `json:"courier"`
-	Sender              Sender    `json:"sender"`
-	Recipient           Recipient `json:"recipient"`
-	WeightInGrams       int       `json:"weightInGrams"`
+	TrackingCode  string    `json:"trackingCode"`
+	Courier       string    `json:"courier"`
+	Sender        Sender    `json:"sender"`
+	Recipient     Recipient `json:"recipient"`
+	WeightInGrams int       `json:"weightInGrams"`
 	Size
-	Content             string    `json:"content"`
-	ShippingType        string    `json:"shippingType"`
-	IsFragile           bool      `json:"isFragile"`
-	LastState           string    `json:"lastState"`
-	LastLocation        *Address  `json:"lastLocation"`
-	IsInCourierFacility bool      `json:"isInCourierFacility"`
-	CreatedAt           time.Time `json:"createdAt"`
-	UpdatedAt           time.Time `json:"updatedAt"`
+	Content      string    `json:"content"`
+	ShippingType string    `json:"shippingType"`
+	IsFragile    bool      `json:"isFragile"`
+	LastState    string    `json:"lastState"`
+	LastLocation *Address  `json:"lastLocation"`
+	IsDelivered  bool      `json:"isDelivered"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
 type ShipmentRecord struct {
@@ -43,19 +43,19 @@ func NewShipment(
 	updatedAt time.Time,
 ) *Shipment {
 	shipment := &Shipment{
-		TrackingCode:        trackingCode,
-		Courier:             courier,
-		Sender:              sender,
-		Recipient:           recipient,
-		WeightInGrams:       weightInGrams,
-		ShippingType:        shippingType,
-		Size:                size,
-		Content:             content,
-		IsFragile:           isFragile,
-		LastState:           lastState,
-		IsInCourierFacility: false,
-		CreatedAt:           createdAt,
-		UpdatedAt:           updatedAt,
+		TrackingCode:  trackingCode,
+		Courier:       courier,
+		Sender:        sender,
+		Recipient:     recipient,
+		WeightInGrams: weightInGrams,
+		ShippingType:  shippingType,
+		Size:          size,
+		Content:       content,
+		IsFragile:     isFragile,
+		LastState:     lastState,
+		IsDelivered:   false,
+		CreatedAt:     createdAt,
+		UpdatedAt:     updatedAt,
 	}
 
 	return shipment

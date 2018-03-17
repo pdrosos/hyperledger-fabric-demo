@@ -28,12 +28,14 @@ func main() {
 	defer fabricSDK.Close()
 
 	// get Fabric channel client
-	channelClient, err := fabricsdk.GetChannelClient(fabricSDK)
+	channelClient, err := fabricsdk.GetChannelClient()
 	if err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"error": err,
 		}).Fatal("Unable to create Fabric channel client")
 	}
+
+	handler.Register(channelClient)
 
 	var port uint
 	var verbose bool = false
@@ -46,8 +48,6 @@ func main() {
 	}
 
 	hostAndPort := fmt.Sprintf(":%d", port)
-
-	handler.Register(channelClient)
 
 	logger.Log.Infof("Starting the web server on %s. Revision: %s", hostAndPort, logger.Revision)
 

@@ -8,13 +8,34 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/cmd/apiserver/handler"
-	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/logger"
 	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/common"
+	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/fabricsdk"
+	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/logger"
 )
 
 func main() {
 	common.LoadConfig()
 	logger.Log.Info("* Web server")
+
+	// connect to Fabric SDK
+	fabricSDK, err := fabricsdk.GetFabricSdk()
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Unable to connect to Fabric SDK")
+	}
+
+	defer fabricSDK.Close()
+
+	// get Fabric channel client
+	channelClient, err := fabricsdk.GetChannelClient()
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Unable to create Fabric channel client")
+	}
+
+	handler.Register(channelClient)
 
 	var port uint
 	var verbose bool = false
@@ -27,8 +48,6 @@ func main() {
 	}
 
 	hostAndPort := fmt.Sprintf(":%d", port)
-
-	handler.Register()
 
 	logger.Log.Infof("Starting the web server on %s. Revision: %s", hostAndPort, logger.Revision)
 
