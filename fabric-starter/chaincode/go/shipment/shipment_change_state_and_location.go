@@ -114,7 +114,11 @@ func (this *ShipmentChaincode) changeShipmentStateAndLocation(stub shim.Chaincod
 	}
 
 	// send shipment-state-and-location-changed event to the SDK
-	stub.SetEvent("shipment-state-and-location-changed", shipmentJSONAsBytes)
+	if shipment.IsDelivered {
+		stub.SetEvent("shipment-delivered", shipmentJSONAsBytes)
+	} else {
+		stub.SetEvent("shipment-state-and-location-changed", shipmentJSONAsBytes)
+	}
 
 	logger.Debugf("End changeShipmentStateAndLocation for shipment %s", trackingCode)
 
