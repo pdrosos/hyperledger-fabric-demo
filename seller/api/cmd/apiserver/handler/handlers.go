@@ -21,7 +21,7 @@ func Register(channelClient *channel.Client) {
 
 	router.Handle("/shipments/{trackingCode}", shipmentHandler.GetByTrackingCode()).Methods("GET")
 
-	router.Handle("/shipments/history/{trackingCode}", shipmentHandler.GetHistory()).Methods("GET")
+	router.Handle("/shipments/{trackingCode}/history", shipmentHandler.GetHistory()).Methods("GET")
 
 	// default route
 	router.Handle("/", NewRootHandler()).Methods("GET", "HEAD")

@@ -118,9 +118,82 @@ func (this *ShipmentService) GetAll() ([]model.Shipment, error) {
 }
 
 func (this *ShipmentService) GetByTrackingCode(trackingCode string) (*model.Shipment, error) {
-	return nil, nil
+	args := [][]byte{
+		[]byte(trackingCode),
+	}
+	response, err := this.channelClient.Query(
+		channel.Request{
+			ChaincodeID: this.chaincodeID,
+			Fcn:         "getShipmentByTrackingCode",
+			Args:        args,
+		},
+	)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"response": string(response.Payload),
+		}).WithError(err).Errorf("Unable to get shipment %s by tracking code", trackingCode)
+
+		return nil, err
+	}
+
+	shipment := model.Shipment{}
+	err = json.Unmarshal(response.Payload, &shipment)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"payload": string(response.Payload),
+		}).WithError(err).Errorf("Unable to unmarshal shipment %s payload", trackingCode)
+
+		return nil, err
+	}
+
+	return &shipment, nil
 }
 
-func (this *ShipmentService) GetHistory(trackingCode string) ([]*model.Shipment, error) {
-	return nil, nil
+func (this *ShipmentService) GetHistory(trackingCode string) ([]model.Shipment, error) {
+	args := [][]byte{
+		[]byte(trackingCode),
+	}
+	response, err := this.channelClient.Query(
+		channel.Request{
+			ChaincodeID: this.chaincodeID,
+			Fcn:         "getShipmentHistory",
+			Args:        args,
+		},
+	)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"response": string(response.Payload),
+		}).WithError(err).Errorf("Unable to get shipment %s history", trackingCode)
+
+		return nil, err
+	}
+
+	history := make(inputmodel.ShipmentHistory, 0)
+	err = json.Unmarshal(response.Payload, &history)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"payload": string(response.Payload),
+		}).WithError(err).Errorf("Unable to unmarshal shipment %s history payload", trackingCode)
+
+		return nil, err
+	}
+
+	shipments := make([]model.Shipment, 0, len(history))
+
+	for key, value := range history {
+		shipment := model.Shipment{}
+		err := json.Unmarshal([]byte(value.Value), &shipment)
+		if err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"key":   key,
+				"value": value,
+			}).WithError(err).Errorf("Unable to unmarshal shipment % history record from value", trackingCode)
+
+			return nil, err
+		}
+
+		shipments = append(shipments, shipment)
+	}
+
+	return shipments, nil
 }

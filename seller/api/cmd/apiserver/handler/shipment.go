@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/cmd/apiserver/response"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/logger"
 	"github.com/pdrosos/hyperledger-fabric-demo/seller/api/model"
@@ -79,7 +81,7 @@ func (this *ShipmentHandler) create(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (this *ShipmentHandler) getAll(rw http.ResponseWriter, r *http.Request) {
-	data, err := this.shipmentService.GetAll()
+	shipments, err := this.shipmentService.GetAll()
 	if err != nil {
 		response.ResponseError(
 			rw,
@@ -94,7 +96,7 @@ func (this *ShipmentHandler) getAll(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	rw.Header().Set("Content-Type", "application/json")
-	jsonResponse, err := json.Marshal(data)
+	jsonResponse, err := json.Marshal(shipments)
 	if err != nil {
 		response.ResponseError(
 			rw,
@@ -112,9 +114,73 @@ func (this *ShipmentHandler) getAll(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (this *ShipmentHandler) getByTrackingCode(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	trackingCode := vars["trackingCode"]
 
+	shipment, err := this.shipmentService.GetByTrackingCode(trackingCode)
+	if err != nil {
+		response.ResponseError(
+			rw,
+			http.StatusInternalServerError,
+			"InternalServerError",
+			"Can not get shipment",
+			make([]viewmodel.ErrorDetails, 0),
+			err,
+		)
+
+		return
+	}
+
+	rw.Header().Set("Content-Type", "application/json")
+	jsonResponse, err := json.Marshal(shipment)
+	if err != nil {
+		response.ResponseError(
+			rw,
+			http.StatusInternalServerError,
+			"InternalServerError",
+			"Can not encode json",
+			make([]viewmodel.ErrorDetails, 0),
+			err,
+		)
+
+		return
+	}
+
+	rw.Write(jsonResponse)
 }
 
 func (this *ShipmentHandler) getHistory(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	trackingCode := vars["trackingCode"]
 
+	shipmentHistory, err := this.shipmentService.GetHistory(trackingCode)
+	if err != nil {
+		response.ResponseError(
+			rw,
+			http.StatusInternalServerError,
+			"InternalServerError",
+			"Can not get shipment history",
+			make([]viewmodel.ErrorDetails, 0),
+			err,
+		)
+
+		return
+	}
+
+	rw.Header().Set("Content-Type", "application/json")
+	jsonResponse, err := json.Marshal(shipmentHistory)
+	if err != nil {
+		response.ResponseError(
+			rw,
+			http.StatusInternalServerError,
+			"InternalServerError",
+			"Can not encode json",
+			make([]viewmodel.ErrorDetails, 0),
+			err,
+		)
+
+		return
+	}
+
+	rw.Write(jsonResponse)
 }
