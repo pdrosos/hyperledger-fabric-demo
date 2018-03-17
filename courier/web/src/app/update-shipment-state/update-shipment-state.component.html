@@ -1,0 +1,118 @@
+<div class="container" *ngIf="trackingCode">
+  <h3 class="text-center">Update shipment {{ trackingCode }} state and location</h3>
+
+  <form (ngSubmit)="onUpdateShipmentStateSubmit()" #updateShipmentStateForm="ngForm" novalidate>
+    <fieldset>
+      <legend>Shipment</legend>
+
+      <div class="form-group row">
+        <label for="state" class="col-form-label col-md-3">State</label>
+        <div class="col-md-6">
+          <select id="state"
+                  name="state"
+                  required
+                  [(ngModel)]="shipmentState.state"
+                  #stateControl="ngModel"
+                  class="custom-select"
+                  [class.is-invalid]="stateControl.invalid && (stateControl.touched || updateShipmentStateForm.submitted)">
+            <option value="Arrived at courier facility">Arrived at courier facility</option>
+            <option value="Left courier facility">Left courier facility</option>
+            <option value="Out for delivery">Out for delivery</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+
+          <div *ngIf="stateControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Current Location</legend>
+
+      <div class="form-group row">
+        <label for="locationCountry" class="col-form-label col-md-3">Country</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="locationCountry"
+                 name="locationCountry"
+                 required
+                 [(ngModel)]="shipmentState.location.country"
+                 #locationCountryControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="locationCountryControl.invalid && (locationCountryControl.touched || updateShipmentStateForm.submitted)">
+
+          <div *ngIf="locationCountryControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="locationCity" class="col-form-label col-md-3">City</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="locationCity"
+                 name="locationCity"
+                 required
+                 [(ngModel)]="shipmentState.location.city"
+                 #locationCityControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="locationCityControl.invalid && (locationCityControl.touched || updateShipmentStateForm.submitted)">
+
+          <div *ngIf="locationCityControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="locationPostCode" class="col-form-label col-md-3">Post code</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="locationPostCode"
+                 name="locationPostCode"
+                 required
+                 [(ngModel)]="shipmentState.location.postCode"
+                 #locationPostCodeControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="locationPostCodeControl.invalid && (locationPostCodeControl.touched || updateShipmentStateForm.submitted)">
+
+          <div *ngIf="locationPostCodeControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="locationAddress" class="col-form-label col-md-3">Address</label>
+        <div class="col-md-6">
+          <input type="text"
+                 id="locationAddress"
+                 name="locationAddress"
+                 required
+                 [(ngModel)]="shipmentState.location.address"
+                 #locationAddressControl="ngModel"
+                 class="form-control"
+                 [class.is-invalid]="locationAddressControl.invalid && (locationAddressControl.touched || updateShipmentStateForm.submitted)">
+
+          <div *ngIf="locationAddressControl.errors?.required" class="invalid-feedback">
+            Value is required
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="row">
+      <div class="col-lg-3 mb-3">
+        <button type="submit" class="btn btn-success" [disabled]="submitDisabled">
+          Update Shipment
+        </button>
+      </div>
+      <div class="col-lg-9 mb-3">
+        <button type="button" class="btn btn-outline-secondary" routerLink="/">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div>

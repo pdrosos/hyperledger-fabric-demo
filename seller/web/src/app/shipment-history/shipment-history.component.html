@@ -1,6 +1,6 @@
 <div class="container" *ngIf="(shipmentHistory$ | async) && shipment">
   <h2 class="text-center">
-    Tracking {{ shipment.courier }} Shipment ({{ trackingCode }})
+    Tracking {{ shipment.courier | titlecase }} Shipment ({{ trackingCode }})
   </h2>
 
   <div class="row">

@@ -1,6 +1,6 @@
 <div class="container" *ngIf="shipment">
   <h2 class="text-center">
-    {{ shipment.courier }} Shipment Current State ({{ trackingCode }})
+    {{ shipment.courier | titlecase }} Shipment Current State ({{ trackingCode }})
   </h2>
 
   <div class="row">

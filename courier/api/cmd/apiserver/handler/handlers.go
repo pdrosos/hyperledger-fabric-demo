@@ -16,6 +16,7 @@ func Register(channelClient *channel.Client) {
 	webClientUrl := viper.GetString("app.webClient.url")
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{webClientUrl},
+		AllowedMethods: []string{"GET", "PATCH", "HEAD"},
 	})
 
 	router := mux.NewRouter()
