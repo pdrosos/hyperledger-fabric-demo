@@ -5,11 +5,11 @@ import (
 )
 
 type Shipment struct {
-	TrackingCode        string    `json:"trackingCode"`
-	Courier             string    `json:"courier"`
-	Sender              Sender    `json:"sender"`
-	Recipient           Recipient `json:"recipient"`
-	WeightInGrams       int       `json:"weightInGrams"`
+	TrackingCode  string    `json:"trackingCode"`
+	Courier       string    `json:"courier"`
+	Sender        Sender    `json:"sender"`
+	Recipient     Recipient `json:"recipient"`
+	WeightInGrams int       `json:"weightInGrams"`
 	Size
 	Content             string    `json:"content"`
 	ShippingType        string    `json:"shippingType"`

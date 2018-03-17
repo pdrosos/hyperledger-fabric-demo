@@ -3,3 +3,4 @@ app:
     organization: seller
     username: User1
     channelID: seller-courier1
+    chaincodeID: shipment

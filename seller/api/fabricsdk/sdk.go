@@ -13,11 +13,11 @@ import (
 
 func GetFabricSdk() (*fabsdk.FabricSDK, error) {
 	// load config
-	configOpt := config.FromFile("./../config/network_config.yaml")
+	configOpt := config.FromFile("./config/network_config.yaml")
 
 	sdk, err := fabsdk.New(configOpt)
 	if err != nil {
-		logger.Log.WithError(err).Fatal("Unable to create Fabric SDK")
+		logger.Log.WithError(err).Error("Unable to create Fabric SDK")
 
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func GetChannelClient(fabricSDK *fabsdk.FabricSDK) (*channel.Client, error) {
 
 	client, err := channel.New(clientChannelContext)
 	if err != nil {
-		logger.Log.WithError(err).Fatal("Unable to create Fabric Channel Client")
+		logger.Log.WithError(err).Error("Unable to create Fabric Channel Client")
 
 		return nil, err
 	}
