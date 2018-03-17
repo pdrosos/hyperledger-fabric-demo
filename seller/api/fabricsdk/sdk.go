@@ -120,3 +120,40 @@ func LoadPeers() (fab.Peer, fab.Peer, error) {
 
 	return organizationPeer0, courier1Peer0, nil
 }
+
+func RegisterChaincodeEvent(
+	channelClient *channel.Client,
+	chaincodeID string,
+	eventID string,
+	chaincodeEventHandler ChaincodeEventHandler,
+) {
+	reg, notifier, err := channelClient.RegisterChaincodeEvent(chaincodeID, eventID)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"error":       err,
+			"chaincodeID": chaincodeID,
+			"eventID":     eventID,
+		}).Error("Unable to register chaincode event")
+
+		return
+	} else {
+		logger.Log.WithFields(logrus.Fields{
+			"chaincodeID": chaincodeID,
+			"eventID":     eventID,
+		}).Info("Registered chaincode event")
+	}
+
+	defer channelClient.UnregisterChaincodeEvent(reg)
+
+	select {
+	case ccEvent := <-notifier:
+		logger.Log.WithFields(logrus.Fields{
+			"chaincodeID": chaincodeID,
+			"event":       ccEvent,
+		}).Info("Received chaincode event")
+
+		if chaincodeEventHandler != nil {
+			chaincodeEventHandler.Handle(ccEvent)
+		}
+	}
+}

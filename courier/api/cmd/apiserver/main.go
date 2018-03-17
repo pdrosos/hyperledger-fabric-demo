@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/cmd/apiserver/handler"
 	"github.com/pdrosos/hyperledger-fabric-demo/courier/api/common"
@@ -35,8 +36,15 @@ func main() {
 		}).Fatal("Unable to create Fabric channel client")
 	}
 
+	// Register chaincode event
+	chaincodeID := viper.GetString("app.fabric.chaincodeID")
+	eventID := "shipment-created"
+	go fabricsdk.RegisterChaincodeEvent(channelClient, chaincodeID, eventID, nil)
+
+	// register http handlers
 	handler.Register(channelClient)
 
+	// start web server
 	var port uint
 	var verbose bool = false
 

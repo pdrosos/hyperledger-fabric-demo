@@ -60,7 +60,7 @@
             {{ shipment.updatedAt | date:'short':'':'uk' }}
           </td>
           <td>
-            <a [routerLink]="['/shipments', shipment.trackingCode, 'state']" class="btn btn-light">
+            <a [routerLink]="['/shipments', shipment.trackingCode, 'state']" class="btn btn-light" *ngIf="!shipment.isDelivered">
               Update state
             </a>
           </td>
